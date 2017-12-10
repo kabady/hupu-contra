@@ -50,19 +50,7 @@ export class Game implements Page{
 
     this.stage = new createjs.Stage(this.canvas);
     
-    setInterval( () => {
-      console.log(this.player.state)
-      switch(this.player.state){
-        case 'run':
-          this.player.stand();
-          break;
-        case 'stand':
-          this.player.run();
-          break;
-      }
-    }, 3000)
-
-    this.player.run();
+    this.player.decease();
     createjs.Ticker.addEventListener("tick", (e) => this.createjsTicker(e));
     // createjs.Ticker.setFPS(10); //Deprecated
     createjs.Ticker.framerate = 30;

@@ -497,7 +497,7 @@ exports.RemInit = RemInit;
 Object.defineProperty(exports, "__esModule", { value: true });
 __webpack_require__(17);
 var html = __webpack_require__(14);
-var App = (function () {
+var App = /** @class */ (function () {
     function App() {
         this.elemList = [];
         var elemList = document.querySelectorAll('app');
@@ -536,7 +536,7 @@ var player_1 = __webpack_require__(21);
 var gameCtrl_1 = __webpack_require__(20);
 var devicePixelRatio = window.devicePixelRatio;
 var showRatio = 568 / 320;
-var Game = (function () {
+var Game = /** @class */ (function () {
     function Game() {
         this.elemList = [];
         this.player = new player_1.Player();
@@ -563,18 +563,7 @@ var Game = (function () {
         this.canvas.setAttribute('width', this.showContainer_width + '');
         this.canvas.setAttribute('height', (this.showContainer_width / showRatio) + '');
         this.stage = new createjs.Stage(this.canvas);
-        setInterval(function () {
-            console.log(_this.player.state);
-            switch (_this.player.state) {
-                case 'run':
-                    _this.player.stand();
-                    break;
-                case 'stand':
-                    _this.player.run();
-                    break;
-            }
-        }, 3000);
-        this.player.run();
+        this.player.decease();
         createjs.Ticker.addEventListener("tick", function (e) { return _this.createjsTicker(e); });
         // createjs.Ticker.setFPS(10); //Deprecated
         createjs.Ticker.framerate = 30;
@@ -607,7 +596,7 @@ exports.Game = Game;
 Object.defineProperty(exports, "__esModule", { value: true });
 __webpack_require__(19);
 var html = __webpack_require__(16);
-var OrientationTip = (function () {
+var OrientationTip = /** @class */ (function () {
     function OrientationTip() {
         if (!document.querySelector('#orientLayer')) {
             var a = document.createElement('orientation-tip');
@@ -957,7 +946,7 @@ if(false) {
 "use strict";
 
 Object.defineProperty(exports, "__esModule", { value: true });
-var GameCtrl = (function () {
+var GameCtrl = /** @class */ (function () {
     function GameCtrl() {
     }
     return GameCtrl;
@@ -972,7 +961,7 @@ exports.GameCtrl = GameCtrl;
 "use strict";
 
 Object.defineProperty(exports, "__esModule", { value: true });
-var Player = (function () {
+var Player = /** @class */ (function () {
     function Player() {
         this.bullets = [];
         this.renderList = [];
@@ -982,20 +971,23 @@ var Player = (function () {
         var playerSheet = new createjs.SpriteSheet({
             framerate: 30,
             images: [__webpack_require__(23)],
-            frames: { regX: 0, regY: 0, height: 250, width: 250, count: 3 },
+            frames: { regX: 0, regY: 0, height: 250, width: 250, count: 10 },
             // define two animations, run (loops, 1.5x speed) and jump (returns to run):
             animations: {
                 run: { frames: [1, 2], speed: .15 },
-                stand: { frames: [0] }
+                stand: { frames: [0] },
+                decease: { frames: [3, 4, 5, 6, 7, 8, 9], speed: .1 }
             }
         });
         this.playerRun = new createjs.Sprite(playerSheet, "run");
         this.playerStand = new createjs.Sprite(playerSheet, "stand");
+        this.playerDecease = new createjs.Sprite(playerSheet, "decease");
         // this.bulletTemp = new createjs.Bitmap(require('../../style/star.png'));
     }
     Player.prototype.clearState = function () {
         this.removeList.push(this.playerRun);
         this.removeList.push(this.playerStand);
+        this.removeList.push(this.playerDecease);
     };
     Player.prototype.clearStateExpect = function (expectObject) {
         if (expectObject !== this.playerRun) {
@@ -1003,6 +995,9 @@ var Player = (function () {
         }
         if (expectObject !== this.playerStand) {
             this.removeList.push(this.playerStand);
+        }
+        if (expectObject !== this.playerDecease) {
+            this.removeList.push(this.playerDecease);
         }
     };
     Player.prototype.run = function () {
@@ -1014,6 +1009,11 @@ var Player = (function () {
         this.state = 'stand';
         this.clearStateExpect(this.playerStand);
         this.renderList.push(this.playerStand);
+    };
+    Player.prototype.decease = function () {
+        this.state = 'decease';
+        this.clearStateExpect(this.playerDecease);
+        this.renderList.push(this.playerDecease);
     };
     Player.prototype.shoot = function () {
         var bullet = this.bulletTemp.clone();
@@ -1064,7 +1064,7 @@ appInit();
 /* 23 */
 /***/ (function(module, exports, __webpack_require__) {
 
-var path = __webpack_require__(9);module.exports = path.resolve("hero.3b7755b718979ca5627814170827f3e2.png");
+var path = __webpack_require__(9);module.exports = path.resolve("hero.48cfaf72b1fc26acda8e177e609a0d71.png");
 
 /***/ }),
 /* 24 */
