@@ -36,5 +36,7 @@
     "url-loader": "^0.5.8",
     "webpack": "^2.6.1"
   },
-  "dependencies": {}
+  "dependencies": {
+    "fastclick": "^1.0.6"
+  }
 }

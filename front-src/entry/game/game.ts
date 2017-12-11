@@ -12,6 +12,7 @@ const checkPixelCollision = _window.ndgmr.checkPixelCollision;
 
 
 import { Player } from './player';
+import { Boss } from './boss';
 import { GameCtrl } from './gameCtrl';
 
 const devicePixelRatio: number = window.devicePixelRatio;
@@ -23,7 +24,9 @@ export class Game implements Page{
   showContainer_height: number;
   showContainer_width: number;
   player: Player = new Player();
+  boss: Boss = new Boss();
   gameCtrl: GameCtrl = new GameCtrl();
+  bullets: Array<createjs.DisplayObject> = [];
   constructor(){
     if(game)
       return game
@@ -33,6 +36,7 @@ export class Game implements Page{
     document.querySelector('body').appendChild(gameElem);
     this.elemList.push(gameElem);
     this.canvas = gameElem.querySelector('#canvas');
+    this.gameCtrl.setCtrlContainer(gameElem.querySelector('.ctrl-container'));
     this.initCreatejs();
   }
   hide(): void{
@@ -49,8 +53,24 @@ export class Game implements Page{
     this.canvas.setAttribute('height', (this.showContainer_width / showRatio) + '');
 
     this.stage = new createjs.Stage(this.canvas);
-    
-    this.player.decease();
+
+    this.boss.setState(this.boss.STATE_BOSS_NO_ONE);
+    this.boss.shot(this.player, () => {
+      console.log('boss: The player has shot me');
+    })
+    this.player.shootSomeOne(this.boss, () => {
+      console.log('player: I shot the boss');
+    });
+
+    this.player.run();
+    this.gameCtrl.setRighttListener(() => {
+      // this.player.shoot();
+      this.player.shoot((bullets) => {
+        this.bullets = this.bullets.concat(bullets);
+        console.log(this.bullets)
+      })
+    });
+
     createjs.Ticker.addEventListener("tick", (e) => this.createjsTicker(e));
     // createjs.Ticker.setFPS(10); //Deprecated
     createjs.Ticker.framerate = 30;
@@ -65,7 +85,17 @@ export class Game implements Page{
       this.player.clearRenderCache();
     });
 
+    this.boss.removeList.forEach((removeObject) => {
+      this.stage.removeChild(removeObject);
+      this.boss.clearRemoveCache();
+    })
+    this.boss.renderList.forEach((renderObject, i) => {
+      this.stage.addChild(renderObject);
+      this.boss.clearRenderCache();
+    });
+    // console.log(11, this.bullets)
     this.stage.update();
+    this.player.nextFrameRun();
     // 碰撞检测
     checkRectCollision
     
