@@ -7,7 +7,14 @@ game{
   .canvas-container{
     position: relative;
     width: 100%;
-    padding-top: 320 / 568 * 100%;
+    padding-top: 856 / 1800 * 100%;
+    > .bg{
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+    }
   }
   #canvas{
     position: absolute;
@@ -16,7 +23,6 @@ game{
     width: 100%;
     height: 100%;
     display: block;
-    background: #000;
   }
   .ctrl-container{
     position: absolute;

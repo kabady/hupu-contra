@@ -1,9 +1,10 @@
-import { CanShoot } from "./canShoot";
-import { CanShot } from "./canShot";
+import { CanShoot, ShootRelative } from "../canShoot";
+import { CanShot } from "../canShot";
 import { Bullet } from "./bullet";
-import { NextFrameRunTime } from "./nextFrameRunTime";
+import { NextFrameRunTime } from "../game";
+import { assetMapQueue } from "../game-asset";
 
-export class Player implements CanShoot, CanShot, NextFrameRunTime{
+export class Player implements CanShoot, NextFrameRunTime{
   el: createjs.DisplayObject;
 
   renderList: Array<createjs.DisplayObject> = [];
@@ -16,11 +17,13 @@ export class Player implements CanShoot, CanShot, NextFrameRunTime{
   state: string = '';
 
   curDisplay: createjs.DisplayObject;
+  bullets: Array<Bullet> = [];
+  
   constructor(){
     //创建一个显示对象
     var playerSheet = new createjs.SpriteSheet({
       framerate: 30,
-      images: [require("../../_assets/hero.png")],
+      images: [assetMapQueue.getResult('hero')],
       frames: {regX: 0, regY: 0, height: 250, width: 250, count: 10},
       // define two animations, run (loops, 1.5x speed) and jump (returns to run):
       animations: {
@@ -38,7 +41,11 @@ export class Player implements CanShoot, CanShot, NextFrameRunTime{
     this.playerDecease = new createjs.Sprite(playerSheet, "decease");
     this.playerShooting = new createjs.Sprite(playerSheet, "stand");
     
-    this.playerRun.y = this.playerStand.y = this.playerDecease.y = this.playerShooting.y = 550;
+    this.setXY(200, 450);
+  }
+  setXY(x: number, y: number): void{
+    this.playerRun.x = this.playerStand.x = this.playerDecease.x = this.playerShooting.x = x;
+    this.playerRun.y = this.playerStand.y = this.playerDecease.y = this.playerShooting.y = y;
   }
   clearState(): void{
     this.removeList.push(this.playerRun);
@@ -65,6 +72,25 @@ export class Player implements CanShoot, CanShot, NextFrameRunTime{
     this.clearStateExpect(this.playerRun);
     this.renderList.push(this.playerRun);
   }
+  runToNextScene(handle: ()=> void): void{
+    this.run();
+    createjs.Tween.get(this.curDisplay)
+    .wait(100)
+    // from x: 200
+    .to({x: 1800}, 4000)
+    .call(() => handle());
+  }
+  enterNextScence():void{
+    this.setXY(200, 550);
+    createjs.Tween.get(this.curDisplay)
+    .to({x: -200}, 0)
+    .to({x: 200}, 1000)
+    .call(() => this.enterNextScenceOver());
+  }
+  enterNextScenceOver():void{
+    this.stand();
+    console.log('i has entered');
+  }
   stand(): void{
     this.state = 'stand';
     this.curDisplay = this.playerStand;
@@ -77,13 +103,28 @@ export class Player implements CanShoot, CanShot, NextFrameRunTime{
     this.clearStateExpect(this.playerDecease);
     this.renderList.push(this.playerDecease);
   }
-  shootSomeOne(who: CanShot, handle: () => void): void{
-    
+  shootRelative: Array<ShootRelative> = [];
+  shootSomeOne(who: CanShot, handle: (bullet: Bullet) => void): void{
+    this.shootRelative.push({
+      from: this,
+      to: who,
+      handle: handle
+    })
   }
-  shot(shooter: CanShoot, handle: () => void): void{
-    
+  hasShot(who: CanShot, bullet: Bullet): void{
+    this.shootRelative.forEach( (shootRelative) => {
+      if(shootRelative.to == who && shootRelative.from == this){
+        shootRelative.handle(bullet);
+      }
+    })
   }
-  shoot(handle: (bullets: Array<createjs.DisplayObject>) => void): void{
+  removeBullet(bullet: Bullet): void{
+    for(let i = this.bullets.length - 1; i >= 0; i--){
+      if(this.bullets[i] == bullet)
+        this.removeList.push(this.bullets.splice(i, 1)[0].displayObject);
+    }
+  }
+  shoot(): void{
     this.state = 'shoot';
     this.curDisplay = this.playerShooting;
     this.clearStateExpect(this.playerShooting);
@@ -96,22 +137,19 @@ export class Player implements CanShoot, CanShot, NextFrameRunTime{
       }else{
         let base_x: number = this.curDisplay.x;
         let base_y: number = this.curDisplay.y;
-        let bullets: Array<createjs.DisplayObject> = [];
+        let bullets: Array<Bullet> = [];
         for(let i = 0, len = 1; i < len; i++){
-
           let bullet: Bullet = new Bullet();
-          bullets.push(bullet.displayObject);
+          bullet.setFrom(this);
+          bullets.push(bullet);
           bullet.setStart(base_x + bounds.x + bounds.width * .9, base_y + bounds.y + bounds.height * .33);
           this.renderList.push(bullet.displayObject);
           bullet.setOver(() => this.removeList.push(bullet.displayObject));
           bullet.launch();
         }
-        
-        handle(bullets);
+        this.bullets = this.bullets.concat(bullets);
       }
     });
-    
-    // bullet.setStart();
   }
   nextFrameRunList: Array<()=>void> = [];
   nextFrameRun(): void{
@@ -124,6 +162,7 @@ export class Player implements CanShoot, CanShot, NextFrameRunTime{
       }
     }
   }
+
   setNextFrameRun(handle: () => void): void{
     this.nextFrameRunList.push(handle);
   }

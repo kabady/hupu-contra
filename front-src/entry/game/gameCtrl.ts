@@ -29,7 +29,7 @@ export class GameCtrl{
   leftClick(ev: MouseEvent): void{
     this.leftClickHandle();
   }
-  setRighttListener(clickListener: () => void){
+  setRightListener(clickListener: () => void){
     this.rightClickHandle = clickListener;
   }
   rightClick(ev: MouseEvent): void{

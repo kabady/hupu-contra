@@ -15,4 +15,9 @@ export class OrientationTip{
             display: 'none'
         })
     }
+    show(): void{
+        $(this.elem).css({
+            display: 'block'
+        })
+    }
 }
