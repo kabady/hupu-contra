@@ -16,4 +16,4 @@ package-lock.json
 
 private_config/
 
-dest/deplay/*
+dest/deploy/*
