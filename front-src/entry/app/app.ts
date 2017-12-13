@@ -20,7 +20,8 @@ export class App implements Page{
         $(this.elem.querySelector('.poster')).css({display: 'block'});
         
         this.elem.querySelector('.poster img').addEventListener('click', ()=> this.posterClick());
-        this.clickTimer = setTimeout(() => this.posterClick(), 3000)
+        // 上线的时候再开启，以免用户不知道点击画面是开始游戏
+        // this.clickTimer = setTimeout(() => this.posterClick(), 3000)
     }
     posterClick(){
         clearTimeout(this.clickTimer);

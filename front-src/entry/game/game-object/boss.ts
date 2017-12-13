@@ -3,7 +3,7 @@ import { CanShoot, ShootRelative } from "../canShoot";
 import { Bullet } from "./bullet";
 import { assetMapQueue } from "../game-asset";
 
-export class Boss implements CanShot{
+export class Boss implements CanShot, CanShoot{
   static readonly LEVEL_0 = 0;
   static readonly LEVEL_1 = 1;
   static readonly LEVEL_2 = 2;
@@ -15,11 +15,7 @@ export class Boss implements CanShot{
   boss1: createjs.DisplayObject;
   boss0: createjs.DisplayObject;
   curDisplay: createjs.DisplayObject;
-  bullets: Array<Bullet>
-
-  removeBullet(bullet: Bullet): void{
-
-  }
+  
   constructor(){
     this.boss0 = new createjs.Bitmap(assetMapQueue.getResult('boss0'));
     this.boss0.x = 1000;
@@ -48,30 +44,37 @@ export class Boss implements CanShot{
       this.curDisplay = this.boss1;
       this.clearStateExpect(this.curDisplay);
       this.renderList.push(this.curDisplay);
+
       break;
       case Boss.LEVEL_2:
       this.curDisplay = this.boss0;
       this.clearStateExpect(this.curDisplay);
       this.renderList.push(this.curDisplay);
+
       break;
       case Boss.LEVEL_2:
       this.curDisplay = this.boss1;
       this.clearStateExpect(this.curDisplay);
       this.renderList.push(this.curDisplay);
+
       break;
     }
+  }
+  it: any;
+  closeAutoShoot(): void{
+    clearInterval(this.it);
+  }
+  startAutoShoot(): void{
+    this.it = setInterval(() => {
+      this.shoot()
+    }, 3000)
+    this.shoot()
   }
   clearRenderCache(): void{
     this.renderList = [];
   }
   clearRemoveCache(): void{
     this.removeList = [];
-  }
-  shootSomeOne(who: CanShot, handle: () => void): void{
-
-  }
-	shoot(handle: (bullets: Array<Bullet>) => void): void{
-
   }
   shootRelative: Array<ShootRelative> = [];
   shot(shooter: CanShoot, handle: (bullet: Bullet) => void): void{
@@ -94,5 +97,76 @@ export class Boss implements CanShot{
     this.removeList.push(this.boss1);
     this.removeList.push(this.boss1);
     this.curDisplay = null;
+    this.bullets.forEach( bullet => bullet.over() );
+  }
+
+	/**
+	 * who被射击到了，做什么（handle）
+	 * 
+	 * @param {CanShot} who 
+	 * @param {() => void} handle 
+	 * @memberof CanShoot
+	 */
+	shootSomeOne(who: CanShot, handle: (bullet: Bullet) => void): void{
+    this.shootRelative.push({
+      from: this,
+      to: who,
+      handle: handle
+    })
+  }
+	/**
+	 * 发射子弹
+	 * 
+	 * @memberof CanShoot
+	 */
+	shoot(): void{
+    let bounds: createjs.Rectangle =  this.curDisplay.getBounds();
+    if(bounds == null){
+      throw new Error('no bounds');
+    }else{
+      let base_x: number = this.curDisplay.x;
+      let base_y: number = this.curDisplay.y;
+      let bullets: Array<Bullet> = [];
+      for(let i = 0, len = 1; i < len; i++){
+        let bullet: Bullet = new Bullet();
+        bullet.setbullet('boss1Bullet');
+        bullet.setFrom(this);
+        bullets.push(bullet);
+        bullet.setStart(base_x + bounds.x + bounds.width * .2, base_y + bounds.y + bounds.height * .2);
+        bullet.setEnd(-50);
+        this.renderList.push(bullet.displayObject);
+        bullet.setOver(() => this.removeList.push(bullet.displayObject));
+        bullet.launch();
+      }
+      this.bullets = this.bullets.concat(bullets);
+    }
+  }
+	/**
+	 * 子弹数组
+	 * 
+	 * @type {Array<Bullet>}
+	 * @memberof CanShoot
+	 */
+	bullets: Array<Bullet> = [];
+	/**
+	 * 从子弹从属的物体中删除子弹
+	 * 
+	 * @param {Bullet} bullet 
+	 * @memberof CanShoot
+	 */
+	removeBullet(bullet: Bullet): void{
+    for(let i = this.bullets.length - 1; i >= 0; i--){
+      if(this.bullets[i] == bullet)
+        this.removeList.push(this.bullets.splice(i, 1)[0].displayObject);
+    }
+  }
+
+	// WHO 已经被击中了
+	hasShot(who: CanShot, bullet: Bullet): void{
+    this.shootRelative.forEach( (shootRelative) => {
+      if(shootRelative.to == who && shootRelative.from == this){
+        shootRelative.handle(bullet);
+      }
+    })
   }
 }

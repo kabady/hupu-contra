@@ -1,6 +1,8 @@
 import { CanShoot } from "../canShoot";
+import { assetMapQueue, assetMapStr } from "../game-asset";
 
-const bulletTemp: createjs.DisplayObject = new createjs.Bitmap(require('../../../_assets/bullet.png'));
+// const bulletTemp: createjs.DisplayObject = new createjs.Bitmap(assetMapQueue.getResult('heroBullet'));
+let assetMapStrAny: any = assetMapStr;
 export class Bullet {
   displayObject: createjs.DisplayObject;
   x: number;
@@ -10,10 +12,14 @@ export class Bullet {
   from: CanShoot;
 
   bulletAnimation: createjs.Tween;
+  bulletTemp: createjs.DisplayObject = new createjs.Bitmap(assetMapQueue.getResult('heroBullet'));
   overEventHandle: () => void = () => 0;
   shotOverEventHandle: () => void = () => 0;
   constructor() {
-    this.displayObject = bulletTemp.clone();
+    this.displayObject = this.bulletTemp.clone();
+  }
+  setbullet(bulletName: string){
+    this.displayObject = new createjs.Bitmap(assetMapQueue.getResult(bulletName));
   }
   setFrom(from: CanShoot){
     this.from = from;
@@ -22,9 +28,9 @@ export class Bullet {
     this.displayObject.x = x;
     this.displayObject.y = y;
   }
-  setEnd(x: number, y: number): void{
+  setEnd(x: number, y?: number): void{
     this.end_x = x;
-    this.end_y = y;
+    this.end_y = y || this.end_y;
   }
   launch(): void{
     this.bulletAnimation = createjs.Tween.get(this.displayObject)

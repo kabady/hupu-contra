@@ -20,7 +20,7 @@ export interface CanShoot{
 	 * @param {() => void} handle 
 	 * @memberof CanShoot
 	 */
-	shootSomeOne(who: CanShot, handle: () => void): void;
+	shootSomeOne(who: CanShot, handle: (bullet: Bullet) => void): void;
 	/**
 	 * 发射子弹 @Deprecated
 	 * 

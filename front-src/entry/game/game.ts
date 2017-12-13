@@ -78,24 +78,21 @@ export class Game implements Page{
   }
   scene1(){
     this.scenes = assetMapQueue.getResult('scenes1');
-    this.boss.setState(Boss.LEVEL_1);
 
+    this.boss.setState(Boss.LEVEL_1);
     this.player.run();
-    this.gameCanplay = true;
   }
   scene2(){
     this.scenes = assetMapQueue.getResult('scenes2');
     this.boss.setState(Boss.LEVEL_0);
 
     this.player.run();
-    this.gameCanplay = true;
   }
   scene3(){
     this.scenes = assetMapQueue.getResult('scenes3');
     this.boss.setState(Boss.LEVEL_0);
 
     this.player.run();
-    this.gameCanplay = true;
   }
   hide(): void{
     this.elemList.forEach( (elem) => $(elem).css({display: 'none'}));
@@ -107,22 +104,21 @@ export class Game implements Page{
     switch(this.curGameState){
       case Game.BOSS_LEVE_0:
       this.startBoss(Game.BOSS_LEVE_1);
-      this.boss.setState(Boss.LEVEL_1);
       break;
       case Game.BOSS_LEVE_1:
       this.startBoss(Game.BOSS_LEVE_2);
-      this.boss.setState(Boss.LEVEL_2);
       break;
       case Game.BOSS_LEVE_2:
       this.startBoss(Game.BOSS_LEVE_3);
-      this.boss.setState(Boss.LEVEL_3);
       break;
       case Game.BOSS_LEVE_3:
         console.log('game is over')
       break;
     }
-    
-    this.player.enterNextScence();
+    this.player.enterNextScence(() => {
+      this.gameCanplay = true;
+      this.boss.startAutoShoot();
+    });
   }
   initCreatejs(): void{
     this.showContainer_height = 850;
@@ -134,18 +130,24 @@ export class Game implements Page{
     this.stage = new createjs.Stage(this.canvas);
     
     this.boss.shot(this.player, () => {
-      console.log('i has been shot by the player');
+      console.log('boss dying')
       this.boss.hide();
+      this.boss.closeAutoShoot();
     });
     this.player.shootSomeOne(this.boss, (bullet) => {
-      console.log('player: I shot the boss');
       this.gameCanplay = false;
       bullet.destory();
       this.player.runToNextScene(() => {
         this.nextScene();
       });
     });
-
+    this.player.shot(this.boss, () => {
+      console.log('player dying')
+      this.player.dying();
+    })
+    this.boss.shootSomeOne(this.player, (bullet) => {
+      bullet.over();
+    })
     this.gameCtrl.setLeftListener( () => {
       if(this.gameCanplay){
         console.log('i want to jamp');
@@ -184,10 +186,17 @@ export class Game implements Page{
     this.player.nextFrameRun();
     // 碰撞检测
     this.player.bullets.forEach((bullet) => {
-      if(checkRectCollision(bullet.displayObject, this.boss.curDisplay)){
+      if(bullet.displayObject && this.boss.curDisplay && checkPixelCollision(bullet.displayObject, this.boss.curDisplay)){
         // 击中目标
         this.player.hasShot(this.boss, bullet);
         this.boss.hasBeenShot(this.player, bullet);
+      }
+    })
+    this.boss.bullets.forEach( bullet => {
+      if(bullet.displayObject && this.player.curDisplay && checkPixelCollision(bullet.displayObject, this.player.curDisplay)){
+        // 击中目标
+        this.boss.hasShot(this.player, bullet);
+        this.player.hasBeenShot(this.boss, bullet);
       }
     })
   }

@@ -4,6 +4,7 @@ export const assetMapStr: Object = {
   heroBullet: require('../../_assets/hero-bullet.png'),
   boss0: require('../../_assets/boss-0.png'),
   boss1: require('../../_assets/boss-1.png'),
+  boss1Bullet: require('../../_assets/boss-1-bullet.png'),
   scenes0: require('../../_assets/scenes-0.png'),
   scenes1: require('../../_assets/scenes-1.png'),
   scenes2: require('../../_assets/scenes-2.png'),
