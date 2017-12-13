@@ -87,14 +87,14 @@ export class Game implements Page{
     this.scenes = assetMapQueue.getResult('scenes2');
     this.boss.setState(Boss.LEVEL_0);
 
-    this.player.stand();
+    this.player.run();
     this.gameCanplay = true;
   }
   scene3(){
     this.scenes = assetMapQueue.getResult('scenes3');
     this.boss.setState(Boss.LEVEL_0);
 
-    this.player.stand();
+    this.player.run();
     this.gameCanplay = true;
   }
   hide(): void{
@@ -103,7 +103,27 @@ export class Game implements Page{
   show(): void{
     this.elemList.forEach( (elem) => $(elem).css({display: 'block'}));
   }
-
+  nextScene(){
+    switch(this.curGameState){
+      case Game.BOSS_LEVE_0:
+      this.startBoss(Game.BOSS_LEVE_1);
+      this.boss.setState(Boss.LEVEL_1);
+      break;
+      case Game.BOSS_LEVE_1:
+      this.startBoss(Game.BOSS_LEVE_2);
+      this.boss.setState(Boss.LEVEL_2);
+      break;
+      case Game.BOSS_LEVE_2:
+      this.startBoss(Game.BOSS_LEVE_3);
+      this.boss.setState(Boss.LEVEL_3);
+      break;
+      case Game.BOSS_LEVE_3:
+        console.log('game is over')
+      break;
+    }
+    
+    this.player.enterNextScence();
+  }
   initCreatejs(): void{
     this.showContainer_height = 850;
     this.showContainer_width = 1500;
@@ -122,10 +142,7 @@ export class Game implements Page{
       this.gameCanplay = false;
       bullet.destory();
       this.player.runToNextScene(() => {
-        this.startBoss(Game.BOSS_LEVE_1);
-        this.boss.setState(Boss.LEVEL_1);
-        console.log(this.boss.curDisplay)
-        this.player.enterNextScence()
+        this.nextScene();
       });
     });
 

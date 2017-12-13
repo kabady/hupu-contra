@@ -41,25 +41,24 @@ export class Boss implements CanShot{
     switch(state){
       case Boss.LEVEL_0:
       this.curDisplay = this.boss0;
-      this.clearStateExpect(this.boss0);
-      this.renderList.push(this.boss0);
+      this.clearStateExpect(this.curDisplay);
+      this.renderList.push(this.curDisplay);
       break;
       case Boss.LEVEL_1:
       this.curDisplay = this.boss1;
-      this.clearStateExpect(this.boss1);
-      this.renderList.push(this.boss1);
+      this.clearStateExpect(this.curDisplay);
+      this.renderList.push(this.curDisplay);
       break;
       case Boss.LEVEL_2:
       this.curDisplay = this.boss0;
-      this.clearStateExpect(this.boss0);
-      this.renderList.push(this.boss0);
+      this.clearStateExpect(this.curDisplay);
+      this.renderList.push(this.curDisplay);
       break;
       case Boss.LEVEL_2:
-      this.curDisplay = this.boss0;
-      this.clearStateExpect(this.boss0);
-      this.renderList.push(this.boss0);
+      this.curDisplay = this.boss1;
+      this.clearStateExpect(this.curDisplay);
+      this.renderList.push(this.curDisplay);
       break;
-      
     }
   }
   clearRenderCache(): void{
