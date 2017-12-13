@@ -19,7 +19,7 @@ export class App implements Page{
     initEvent(): void{
         $(this.elem.querySelector('.poster')).css({display: 'block'});
         
-        this.elem.querySelector('.poster img').addEventListener('click', this.posterClick);
+        this.elem.querySelector('.poster img').addEventListener('click', ()=> this.posterClick());
         this.clickTimer = setTimeout(() => this.posterClick(), 3000)
     }
     posterClick(){
