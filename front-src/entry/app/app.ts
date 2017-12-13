@@ -6,6 +6,7 @@ import { startLoad } from '../game/game-asset';
 export class App implements Page{
     elemList: Array<Element> = [];
     elem: Element;
+    clickTimer: NodeJS.Timer;
     constructor(){
         let elemList: NodeListOf<Element> = document.querySelectorAll('app');
         for(let i = 0, len = elemList.length; i < len; i++){
@@ -18,10 +19,13 @@ export class App implements Page{
     initEvent(): void{
         $(this.elem.querySelector('.poster')).css({display: 'block'});
         
-        this.elem.querySelector('.poster img').addEventListener('click', () => {
-            this.startLoading();
-            startLoad();
-        });
+        this.elem.querySelector('.poster img').addEventListener('click', this.posterClick);
+        this.clickTimer = setTimeout(() => this.posterClick(), 3000)
+    }
+    posterClick(){
+        clearTimeout(this.clickTimer);
+        this.startLoading();
+        startLoad();
     }
     startLoading():void{
         $(this.elem.querySelector('.poster')).css({display: 'none'});

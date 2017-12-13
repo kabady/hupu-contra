@@ -12,9 +12,10 @@ import { pushLoadComplete } from './game/game-asset';
 function appInit(): void{
   RemInit();
   new OrientationTip().show();
-  new App().show();
+  let app: App = new App();
+  app.show();
   pushLoadComplete(function(){
-    new App().hide();
+    app.hide();
     new Game().show();
   });
 }
