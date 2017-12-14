@@ -4,11 +4,21 @@ export const assetMapStr: Object = {
   heroBullet: require('../../_assets/hero-bullet.png'),
   boss0: require('../../_assets/boss-0.png'),
   boss1: require('../../_assets/boss-1.png'),
+  boss1Playerword1: require('../../_assets/boss-1-player-word-1.jpg'),
+  boss1Playerword2: require('../../_assets/boss-1-player-word-2.jpg'),
+  boss1Playerword3: require('../../_assets/boss-1-player-word-3.jpg'),
   boss1Bullet: require('../../_assets/boss-1-bullet.png'),
-  scenes0: require('../../_assets/scenes-0.png'),
-  scenes1: require('../../_assets/scenes-1.png'),
-  scenes2: require('../../_assets/scenes-2.png'),
-  scenes3: require('../../_assets/scenes-3.png')
+  boss2: require('../../_assets/boss-2.png'),
+  boss2Bg: require('../../_assets/boss-2-bg.png'),
+  boss2Bullet1: require('../../_assets/boss-2-bullet-1.png'),
+  boss2Bullet2: require('../../_assets/boss-2-bullet-2.png'),
+  boss2Bullet3: require('../../_assets/boss-2-bullet-3.png'),
+  boss2Playerword1: require('../../_assets/boss-2-player-word.jpg'),
+  boss3Playerword1: require('../../_assets/boss-3-player-word.jpg'),
+  scenes0: require('../../_assets/scenes-0.jpg'),
+  scenes1: require('../../_assets/scenes-1.jpg'),
+  scenes2: require('../../_assets/scenes-2.jpg'),
+  scenes3: require('../../_assets/scenes-3.jpg')
 }
 let loadCompleteArr: Array<()=>void> = [];
 export function pushLoadComplete(loadComplete){

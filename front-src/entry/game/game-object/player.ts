@@ -20,9 +20,10 @@ export class Player implements CanShoot, NextFrameRunTime, CanShot {
   curDisplay: createjs.DisplayObject;
   bullets: Array<Bullet> = [];
 
+  playerSheet: createjs.SpriteSheet;
   constructor() {
     //创建一个显示对象
-    var playerSheet = new createjs.SpriteSheet({
+    this.playerSheet = new createjs.SpriteSheet({
       framerate: 30,
       images: [assetMapQueue.getResult('hero')],
       frames: { regX: 0, regY: 0, height: 250, width: 250, count: 10 },
@@ -42,11 +43,11 @@ export class Player implements CanShoot, NextFrameRunTime, CanShot {
       }
     });
 
-    this.playerRun = new createjs.Sprite(playerSheet, "run");
-    this.playerStand = new createjs.Sprite(playerSheet, "stand");
-    this.playerDecease = new createjs.Sprite(playerSheet, "decease");
-    this.playerShooting = new createjs.Sprite(playerSheet, "stand");
-    this.playerStandAnimate = new createjs.Sprite(playerSheet, "standAnimate");
+    this.playerRun = new createjs.Sprite(this.playerSheet, "run");
+    this.playerStand = new createjs.Sprite(this.playerSheet, "stand");
+    this.playerDecease = new createjs.Sprite(this.playerSheet, "decease");
+    this.playerShooting = new createjs.Sprite(this.playerSheet, "stand");
+    this.playerStandAnimate = new createjs.Sprite(this.playerSheet, "standAnimate");
 
     this.setXY(200, 450);
   }
@@ -61,6 +62,10 @@ export class Player implements CanShoot, NextFrameRunTime, CanShot {
   }
   standAnimate() {
     this.state = 'standAnimate';
+    let playerStandAnimate = new createjs.Sprite(this.playerSheet, "standAnimate");
+    playerStandAnimate.x = this.playerStandAnimate.x;
+    playerStandAnimate.y = this.playerStandAnimate.y;
+    this.playerStandAnimate = playerStandAnimate;
     this.curDisplay = this.playerStandAnimate;
     this.clearStateExpect(this.playerStandAnimate);
     this.renderList.push(this.playerStandAnimate);
@@ -116,6 +121,10 @@ export class Player implements CanShoot, NextFrameRunTime, CanShot {
   }
   decease(): void {
     this.state = 'decease';
+    let playerDecease = new createjs.Sprite(this.playerSheet, "decease");
+    playerDecease.x = this.playerDecease.x;
+    playerDecease.y = this.playerDecease.y;
+    this.playerDecease = playerDecease;
     this.curDisplay = this.playerDecease;
     this.clearStateExpect(this.playerDecease);
     this.renderList.push(this.playerDecease);
@@ -163,6 +172,9 @@ export class Player implements CanShoot, NextFrameRunTime, CanShot {
           bullet.setFrom(this);
           bullets.push(bullet);
           bullet.setStart(base_x + bounds.x + bounds.width * .9, base_y + bounds.y + bounds.height * .33);
+
+          // bullet.setEnd(bullet.x, 10); // test debug
+          
           this.renderList.push(bullet.displayObject);
           bullet.setOver(() => this.removeList.push(bullet.displayObject));
           bullet.launch();
@@ -223,7 +235,8 @@ export class Player implements CanShoot, NextFrameRunTime, CanShot {
     });
   }
   dying(): void {
-    this.bullets.forEach( bullet => bullet.over() );
+    // 这里需要从原数组删除元素，所以必须在一个新的数组上进行遍历
+    [].slice.call(this.bullets).forEach( bullet => bullet.over());
     this.decease();
     setTimeout(() => {
       this.standAnimate();
