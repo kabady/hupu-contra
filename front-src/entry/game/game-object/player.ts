@@ -1,7 +1,7 @@
 import { CanShoot, ShootRelative } from "../canShoot";
 import { CanShot } from "../canShot";
 import { Bullet } from "./bullet";
-import { NextFrameRunTime } from "../game";
+import { NextFrameRunTime, Game } from "../game";
 import { assetMapQueue } from "../game-asset";
 
 export class Player implements CanShoot, NextFrameRunTime, CanShot {
@@ -12,33 +12,44 @@ export class Player implements CanShoot, NextFrameRunTime, CanShot {
 
   playerRun: createjs.DisplayObject;
   playerStand: createjs.DisplayObject;
+  playerStand2: createjs.DisplayObject;
   playerDecease: createjs.DisplayObject;
   playerShooting: createjs.DisplayObject;
   playerStandAnimate: createjs.DisplayObject;
+  playerjump: createjs.DisplayObject;
+  playerLeftRun: createjs.DisplayObject;
+  playerRightRun: createjs.DisplayObject;
+  playerDecease2: createjs.DisplayObject;
   state: string = '';
 
   curDisplay: createjs.DisplayObject;
   bullets: Array<Bullet> = [];
 
   playerSheet: createjs.SpriteSheet;
+  isAlive = true;
   constructor() {
     //创建一个显示对象
     this.playerSheet = new createjs.SpriteSheet({
       framerate: 30,
       images: [assetMapQueue.getResult('hero')],
-      frames: { regX: 0, regY: 0, height: 250, width: 250, count: 10 },
+      frames: { regX: 0, regY: 0, height: 250, width: 400, count: 30 },
       // define two animations, run (loops, 1.5x speed) and jump (returns to run):
       animations: {
-        run: { frames: [1, 2], speed: .12 },
+        run: { frames: [2, 3], speed: .12 },
         stand: { frames: [0] },
-        decease: { frames: [3, 4], speed: .2, next: 'down' },
+        stand2: { frames: [1] },
+        lfRun: { frames: [6, 7], speed: .12 },
+        rfRun: { frames: [4, 5], speed: .12 },
+        jump: { frames: [9, 10, 11, 12], speed: .2 },
+        decease: { frames: [14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24], speed: .8, next: 'down' },
         down: {
-          frames: [5, 6, 7, 8],
+          frames: [25, 26],
           speed: .1
         },
+        decease2: { frames: [27, 28], speed: .2 },
         standAnimate: {
-          frames: [9],
-          speed: .2, next: 'stand'
+          frames: [25, 24, 23, 22, 21, 20, 19, 18, 17, 16, 15, 14],
+          speed: 1.4, next: 'stand'
         }
       }
     });
@@ -48,12 +59,46 @@ export class Player implements CanShoot, NextFrameRunTime, CanShot {
     this.playerDecease = new createjs.Sprite(this.playerSheet, "decease");
     this.playerShooting = new createjs.Sprite(this.playerSheet, "stand");
     this.playerStandAnimate = new createjs.Sprite(this.playerSheet, "standAnimate");
+    this.playerjump = new createjs.Sprite(this.playerSheet, "jump");
+    this.playerLeftRun = new createjs.Sprite(this.playerSheet, "lfRun");
+    this.playerRightRun = new createjs.Sprite(this.playerSheet, "rfRun");
 
+    this.playerStand2 = new createjs.Sprite(this.playerSheet, "stand2");
+    this.playerDecease2 = new createjs.Sprite(this.playerSheet, "decease2");
     this.setXY(200, 450);
   }
+  /**
+   * 中单也不是死亡
+   * 但是不能发射子弹
+   * 
+   * @type {false}
+   * @memberof Player
+   */
+  isGodPlayer = false;
+  /**
+   * 中单也不是死亡
+   * 但是不能发射子弹
+   * 
+   * @memberof Player
+   */
+  openGod(): void{
+    this.isGodPlayer = true;
+    this.curDisplay.alpha  = .6;
+    setTimeout(() => {
+      this.closeGod();
+    }, 2000);
+  }
+  closeGod():void{
+    this.isGodPlayer = false;
+    this.curDisplay.alpha  = 1;
+  }
+  x: number;
+  y: number;
   setXY(x: number, y: number): void {
-    this.playerRun.x = this.playerStand.x = this.playerDecease.x = this.playerShooting.x = this.playerStandAnimate.x = x;
-    this.playerRun.y = this.playerStand.y = this.playerDecease.y = this.playerShooting.y = this.playerStandAnimate.y = y;
+    this.x = x;
+    this.y = y;
+    this.playerjump.x = this.playerRun.x = this.playerStand.x = this.playerDecease.x = this.playerShooting.x = this.playerStandAnimate.x = x;
+    this.playerjump.y = this.playerRun.y = this.playerStand.y = this.playerDecease.y = this.playerShooting.y = this.playerStandAnimate.y = y;
   }
   clearState(): void {
     this.removeList.push(this.playerRun);
@@ -69,6 +114,9 @@ export class Player implements CanShoot, NextFrameRunTime, CanShot {
     this.curDisplay = this.playerStandAnimate;
     this.clearStateExpect(this.playerStandAnimate);
     this.renderList.push(this.playerStandAnimate);
+    playerStandAnimate.addEventListener('animationend', ()=> {
+      this.stand();
+    })
   }
   clearStateExpect(expectObject: createjs.DisplayObject): void {
     if (expectObject !== this.playerRun) {
@@ -86,6 +134,21 @@ export class Player implements CanShoot, NextFrameRunTime, CanShot {
     if (expectObject !== this.playerStandAnimate) {
       this.removeList.push(this.playerStandAnimate);
     }
+    if (expectObject !== this.playerjump) {
+      this.removeList.push(this.playerjump);
+    }
+    if (expectObject !== this.playerStand2) {
+      this.removeList.push(this.playerStand2);
+    }
+    if (expectObject !== this.playerLeftRun) {
+      this.removeList.push(this.playerLeftRun);
+    }
+    if (expectObject !== this.playerRightRun) {
+      this.removeList.push(this.playerRightRun);
+    }
+    if (expectObject !== this.playerDecease2) {
+      this.removeList.push(this.playerDecease2);
+    }
   }
   run(): void {
     this.state = 'run';
@@ -101,12 +164,25 @@ export class Player implements CanShoot, NextFrameRunTime, CanShot {
       .to({ x: 1800 }, 4000)
       .call(() => handle());
   }
+  scenceState: number;
   enterNextScence(handle: () => void): void {
-    this.setXY(200, 550);
-    createjs.Tween.get(this.curDisplay)
-      .to({ x: -200 }, 0)
-      .to({ x: 200 }, 1000)
-      .call(() => this.enterNextScenceOver(handle));
+    if(this.scenceState == Game.BOSS_LEVE_3){
+      this.setXY(450, 550);
+      createjs.Tween.get(this.curDisplay)
+        .to({ x: -200 }, 0)
+        .to({ x: this.x }, 2000)
+        .call(() => this.enterNextScenceOver(() => {
+          this.stand2();
+          handle();
+        }));
+    }else{
+      this.setXY(200, 550);
+      createjs.Tween.get(this.curDisplay)
+        .to({ x: -200 }, 0)
+        .to({ x: 200 }, 1000)
+        .call(() => this.enterNextScenceOver(handle));
+    }
+    
   }
   enterNextScenceOver(handle: ()=> void): void {
     this.stand();
@@ -114,12 +190,55 @@ export class Player implements CanShoot, NextFrameRunTime, CanShot {
     console.log('i has entered');
   }
   stand(): void {
+    if(this.scenceState == Game.BOSS_LEVE_3){
+      return;
+    }
     this.state = 'stand';
     this.curDisplay = this.playerStand;
-    this.clearStateExpect(this.playerStand);
-    this.renderList.push(this.playerStand);
+    this.clearStateExpect(this.curDisplay);
+    this.renderList.push(this.curDisplay);
   }
+  stand2(x?: number, y?: number): void{
+    this.state = 'stand';
+    this.curDisplay = this.playerStand2
+    this.playerStand2.x = x || 580;
+    this.playerStand2.y = y || 550;
+    this.clearStateExpect(this.curDisplay);
+    this.renderList.push(this.curDisplay);
+  }
+  jumpAnimate: createjs.Tween;
+  jumpNumber: number = 0;
+  jump(): void {
+    if(this.state != 'stand' && this.state != 'jump'){
+      return;
+    }
+    if(this.jumpNumber == 0){
+      this.state = 'jump';
+      this.curDisplay = this.playerjump;
+      this.clearStateExpect(this.curDisplay);
+      this.renderList.push(this.curDisplay);
+      this.jumpAnimate = createjs.Tween.get(this.curDisplay)
+      .to({y: this.y * .6 }, 400, createjs.Ease.sineOut)
+      .to({y: this.y * 1 }, 400, createjs.Ease.sineIn)
+      .call(() => {
+        this.stand();
+        this.jumpNumber = 0;
+      })
+    }else if(this.jumpNumber == 1){
+      this.jumpAnimate.setPaused(true);
+      this.jumpAnimate = createjs.Tween.get(this.curDisplay)
+      .to({y: this.curDisplay.y * .4 }, 400, createjs.Ease.sineOut)
+      .to({y: this.y * 1 }, 400, createjs.Ease.sineIn)
+      .call(() => {
+        this.jumpNumber = 0;
+        this.stand();
+      })
+    }
+    this.jumpNumber++;
+  }
+
   decease(): void {
+
     this.state = 'decease';
     let playerDecease = new createjs.Sprite(this.playerSheet, "decease");
     playerDecease.x = this.playerDecease.x;
@@ -129,6 +248,15 @@ export class Player implements CanShoot, NextFrameRunTime, CanShot {
     this.clearStateExpect(this.playerDecease);
     this.renderList.push(this.playerDecease);
   }
+  decease2(): void {
+    this.state = 'decease';
+    this.playerDecease2.x = this.curDisplay.x;
+    this.playerDecease2.y = this.curDisplay.y;
+    this.curDisplay = this.playerDecease2;
+    this.clearStateExpect(this.curDisplay);
+    this.renderList.push(this.curDisplay);
+  }
+  theAnimate: Array<() => void> = [];
   shootRelative: Array<ShootRelative> = [];
   shootSomeOne(who: CanShot, handle: (bullet: Bullet) => void): void {
     this.shootRelative.push({
@@ -151,13 +279,16 @@ export class Player implements CanShoot, NextFrameRunTime, CanShot {
     }
   }
   shoot(): void {
-    if(!(this.state == 'shoot' || this.state == 'stand' || this.state == 'standAnimate')){
+    if(!(this.state == 'shoot' || this.state == 'stand' || this.state == 'jump')){
+      return;
+    }
+    if(this.isGodPlayer == true){
+      return
+    }
+    if(this.isAlive == false){
       return;
     }
     this.state = 'shoot';
-    this.curDisplay = this.playerShooting;
-    this.clearStateExpect(this.playerShooting);
-    this.renderList.push(this.playerShooting);
 
     this.setNextFrameRun(() => {
       let bounds: createjs.Rectangle = this.curDisplay.getBounds();
@@ -171,8 +302,13 @@ export class Player implements CanShoot, NextFrameRunTime, CanShot {
           let bullet: Bullet = new Bullet();
           bullet.setFrom(this);
           bullets.push(bullet);
-          bullet.setStart(base_x + bounds.x + bounds.width * .9, base_y + bounds.y + bounds.height * .33);
-
+          
+          if(this.scenceState == Game.BOSS_LEVE_3){
+            bullet.setStart(base_x + bounds.x + bounds.width * .5, base_y + bounds.y + bounds.height * 0);
+            bullet.setEnd(base_x + bounds.x + bounds.width * .5, -20);
+          }else{
+            bullet.setStart(base_x + bounds.x + bounds.width * .9, base_y + bounds.y + bounds.height * .33);
+          }
           // bullet.setEnd(bullet.x, 10); // test debug
           
           this.renderList.push(bullet.displayObject);
@@ -234,12 +370,95 @@ export class Player implements CanShoot, NextFrameRunTime, CanShot {
       }
     });
   }
+  bullet_sx: number;
+  bullet_sy: number;
+  bullet_ex: number;
+  bullet_ey: number;
+  setBulletStartXY(x, y): void{
+
+  }
+  setBulletEndXY(x, y): void{
+    
+  }
+  autoShootMark: any;
+  autoShoot(): void{
+    this.autoShootMark = setInterval(() => {
+      setTimeout(() => this.shoot(), 200 * 0)
+      setTimeout(() => this.shoot(), 200 * 1)
+      setTimeout(() => this.shoot(), 200 * 2)
+    }, 1500)
+  }
+  closeAutoShoot(): void{
+    clearInterval(this.autoShootMark);
+  }
   dying(): void {
+    if(this.isAlive == false){
+      return;
+    }
     // 这里需要从原数组删除元素，所以必须在一个新的数组上进行遍历
     [].slice.call(this.bullets).forEach( bullet => bullet.over());
-    this.decease();
+    this.jumpAnimate && this.jumpAnimate.setPaused(true);
+    this.rlRunAnimate && this.rlRunAnimate.setPaused(true);
+    
+    this.jumpNumber = 0;
+    this.isAlive = false;
+    if(this.scenceState == Game.BOSS_LEVE_3){
+      this.decease2();
+    }else{
+      this.decease();
+    }
     setTimeout(() => {
-      this.standAnimate();
+      this.isAlive = true;
+      if(this.scenceState == Game.BOSS_LEVE_3){
+        this.stand2();
+        this.openGod();
+      }else{
+        this.standAnimate();
+      }
+      
     }, 2000);
   }
+  rlRunAnimate: createjs.Tween;
+  rlRunstandence = 60;
+  leftRun():void{
+    if(this.isAlive == false){
+      return;
+    }
+    if(this.curDisplay.x < 200){
+      console.log('超出范围')
+      return ;
+    }
+
+    this.rlRunAnimate && this.rlRunAnimate.setPaused(true);
+    this.state = 'lrun';
+    this.playerLeftRun.x = this.curDisplay.x;
+    this.playerLeftRun.y = this.curDisplay.y;
+    this.curDisplay = this.playerLeftRun;
+    this.clearStateExpect(this.curDisplay);
+    this.renderList.push(this.curDisplay);
+    this.rlRunAnimate = createjs.Tween.get(this.playerLeftRun)
+      .to({x: this.curDisplay.x - this.rlRunstandence}, 300)
+      .call( () => this.stand2(this.curDisplay.x) )
+  }
+  rightRun(): void{
+    if(this.isAlive == false){
+      return;
+    }
+    if(this.curDisplay.x > 900){
+      console.log('超出范围')
+      return ;
+    }
+
+    this.rlRunAnimate && this.rlRunAnimate.setPaused(true);
+    this.state = 'rrun';
+    this.playerRightRun.x = this.curDisplay.x;
+    this.playerRightRun.y = this.curDisplay.y;
+    this.curDisplay = this.playerRightRun;
+    this.clearStateExpect(this.curDisplay);
+    this.renderList.push(this.curDisplay);
+    this.rlRunAnimate = createjs.Tween.get(this.playerRightRun)
+      .to({x: this.curDisplay.x + this.rlRunstandence}, 300)
+      .call( () => this.stand2(this.curDisplay.x) )
+  }
+  
 }

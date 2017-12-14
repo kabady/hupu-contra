@@ -52,7 +52,11 @@ export class Game implements Page{
     this.initCreatejs();
   }
   startBoss(num: number){
+    
+    if(num == Game.BOSS_LEVE_1)
+      num = Game.BOSS_LEVE_3;
     this.curGameState = num;
+    this.player.scenceState = num;
     switch(num){
       case Game.BOSS_LEVE_0:
         this.scene0();
@@ -89,11 +93,16 @@ export class Game implements Page{
 
     this.player.run();
   }
+  basketball: createjs.DisplayObject;
   scene3(){
+    this.basketball = new createjs.Bitmap(assetMapQueue.getResult('backetball'));
+    this.basketball.x = 600;
+    this.basketball.y = 400;
+    this.addScenceObject(this.basketball);
     this.scenes = assetMapQueue.getResult('scenes3');
     this.boss.setState(Boss.LEVEL_3);
-
     this.player.run();
+    
   }
   hide(): void{
     this.elemList.forEach( (elem) => $(elem).css({display: 'none'}));
@@ -101,7 +110,17 @@ export class Game implements Page{
   show(): void{
     this.elemList.forEach( (elem) => $(elem).css({display: 'block'}));
   }
+  scenceRenderList: Array<createjs.DisplayObject> = [];
+  addScenceObject(display: createjs.DisplayObject): void{
+    // todo
+    console.log('需要找到球在哪里？');
+    this.stage.addChild(display);
+    this.scenceRenderList.push(display);
+  }
   nextScene(){
+    while(this.scenceRenderList.length != 0){
+      this.stage.removeChild(this.scenceRenderList.pop())
+    }
     switch(this.curGameState){
       case Game.BOSS_LEVE_0:
       this.startBoss(Game.BOSS_LEVE_1);
@@ -116,12 +135,24 @@ export class Game implements Page{
         console.log('game is over')
       break;
     }
+    console.log(this.curGameState)
+    if(this.curGameState == Game.BOSS_LEVE_3 + 1){
+      return;
+    }
     this.player.enterNextScence(() => {
       this.playerEntered();
     });
   }
   playerEntered(): void{
     this.showMonologue(this.curGameState)
+    
+  }
+  open(){
+    if(this.curGameState == Game.BOSS_LEVE_3){
+      setTimeout(() => {
+        this.player.autoShoot()
+      }, 2000);
+    }
   }
   gameStartPlay(): void{
     this.gameCanplay = true;
@@ -156,6 +187,7 @@ export class Game implements Page{
     setTimeout(() => {
       $('.game-monologue').css({display: 'none'});
       this.gameStartPlay()
+      this.open();
     }, waitTime);
   }
   initCreatejs(): void{
@@ -168,11 +200,12 @@ export class Game implements Page{
     this.stage = new createjs.Stage(this.canvas);
     
     this.boss.shot(this.player, () => {
-      console.log('boss dying')
       this.boss.hide();
       this.boss.closeAutoShoot();
     });
     this.player.shootSomeOne(this.boss, (bullet) => {
+      console.log(111)
+      this.player.closeAutoShoot();
       this.gameCanplay = false;
       bullet.destory();
       this.player.runToNextScene(() => {
@@ -180,7 +213,6 @@ export class Game implements Page{
       });
     });
     this.player.shot(this.boss, () => {
-      console.log('player dying')
       this.player.dying();
     })
     this.boss.shootSomeOne(this.player, (bullet) => {
@@ -188,12 +220,20 @@ export class Game implements Page{
     })
     this.gameCtrl.setLeftListener( () => {
       if(this.gameCanplay){
-        console.log('i want to jamp');
+        if(this.curGameState == Boss.LEVEL_3){
+          this.player.leftRun()
+        }else{
+          this.player.jump()
+        }
       }
     })
     this.gameCtrl.setRightListener( () => {
       if(this.gameCanplay){
-        this.player.shoot()
+        if(this.curGameState == Boss.LEVEL_3){
+          this.player.rightRun()
+        }else{
+          this.player.shoot()
+        }
       }
     });
 
@@ -201,6 +241,7 @@ export class Game implements Page{
     // createjs.Ticker.setFPS(10); //Deprecated
     createjs.Ticker.framerate = 30;
   }
+  
   createjsTicker(e: Object): void{
     this.player.removeList.forEach((removeObject) => {
       this.stage.removeChild(removeObject);
@@ -232,7 +273,7 @@ export class Game implements Page{
         playerShot = true;
       }
     })
-    if(playerShot == false){
+    if(playerShot == false && this.player.isAlive == true && this.player.isGodPlayer == false){
       this.boss.bullets.forEach( bullet => {
         if(bullet.displayObject && this.player.curDisplay && checkPixelCollision(bullet.displayObject, this.player.curDisplay)){
           // 击中目标

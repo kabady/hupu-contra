@@ -41,6 +41,13 @@ export class Boss implements CanShot, CanShoot{
     this.boss2Bg.scaleX = .8;
     this.boss2Bg.x = 1000;
     this.boss2Bg.y = 10;
+
+
+    this.boss3 = new createjs.Bitmap(assetMapQueue.getResult('boss3'));
+    this.boss3.scaleX = this.boss3.scaleY = 1;
+    this.boss3.scaleX = .85
+    this.boss3.x = 570;
+    this.boss3.y = 0;
   }
   clearStateExpect(expectObject: createjs.DisplayObject): void{
     if(expectObject !== this.boss0){
@@ -168,7 +175,7 @@ export class Boss implements CanShot, CanShoot{
           bullet.setbullet(Bullet.BOSS_2_BULLET, '你行你上'[this.boss2TestLoop % 4]);
           this.boss2TestLoop++;
           bullet.setStart(base_x + bounds.x + bounds.width * .2, base_y + bounds.y + bounds.height * .2);
-          bullet.setEnd(300, 700);
+          bullet.setEnd(400, 800);
           bullet.displayObject.scaleX = bullet.displayObject.scaleY = .4;
           bullet.addAnimation( bulletDisplayObj => {
             return createjs.Tween.get(bulletDisplayObj)
@@ -183,8 +190,13 @@ export class Boss implements CanShot, CanShoot{
           this.boss2MouthAnimate();
         }else if(this.curLevel == Boss.LEVEL_3){
           bullet.setbullet(Bullet.BOSS_3_BULLET);
+          bullet.displayObject.scaleX = bullet.displayObject.scaleY = .5;
+          bullet.setStart(base_x + bounds.x + bounds.width * .4, base_y + bounds.y + bounds.height * .4);
+          bullet.setEnd(base_x + bounds.x + bounds.width * .4, 1000);
+          bullet.setAnimateTime(3000);
+          bullet.setGodBullet();
         }
-        
+        console.log(bullet)
         this.renderList.push(bullet.displayObject);
         bullet.setOver(() => this.removeList.push(bullet.displayObject));
         bullet.launch();

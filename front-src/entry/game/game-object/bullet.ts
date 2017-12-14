@@ -21,6 +21,10 @@ export class Bullet {
   constructor() {
     this.displayObject = this.bulletTemp.clone();
   }
+  animateTime: number = 1500;
+  setAnimateTime(time: number): void{
+    this.animateTime = time
+  }
   setbullet(bulletName: string, boss2Txt?: string){
     switch(bulletName){
       case Bullet.BOSS_1_BULLET:
@@ -38,6 +42,7 @@ export class Bullet {
       break;
 
       case Bullet.BOSS_3_BULLET:
+      this.displayObject = new createjs.Bitmap(assetMapQueue.getResult(bulletName));
       break;
     }
   }
@@ -58,7 +63,7 @@ export class Bullet {
     if(this.addAnimationList.length == 0){
       this.end_y = this.end_y || this.y;
       this.bulletAnimation = createjs.Tween.get(this.displayObject)
-      .to({x: this.end_x, y: this.end_y, visible:false}, 1500)
+      .to({x: this.end_x, y: this.end_y, visible:false}, this.animateTime)
       .call(() => this.over());
     }else{
       this.addAnimationList.forEach( aniamte=> this.bulletAnimationList.push(aniamte(this.displayObject).call(()=> this.over())) );
@@ -89,6 +94,22 @@ export class Bullet {
     this.bulletAnimationList.forEach( tween => {
       tween.setPaused(true);
     } )
-    this.from.removeBullet(this);
+    if(this.isGodBullet == false){
+      this.from.removeBullet(this);
+    }
+  }
+  /**
+   * 这个子弹将不在命中目标的时候消失
+   * 
+   * @memberof Boss
+   */
+  isGodBullet = false;
+  /**
+   * 这个子弹将不在命中目标的时候消失
+   * 
+   * @memberof Boss
+   */
+  setGodBullet(): void{
+    this.isGodBullet = true;
   }
 }
