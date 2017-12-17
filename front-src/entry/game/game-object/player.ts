@@ -13,6 +13,7 @@ export class Player implements CanShoot, NextFrameRunTime, CanShot {
   playerRun: createjs.DisplayObject;
   playerStand: createjs.DisplayObject;
   playerStand2: createjs.DisplayObject;
+  playerStand3: createjs.DisplayObject;
   playerDecease: createjs.DisplayObject;
   playerShooting: createjs.DisplayObject;
   playerStandAnimate: createjs.DisplayObject;
@@ -50,7 +51,8 @@ export class Player implements CanShoot, NextFrameRunTime, CanShot {
         standAnimate: {
           frames: [25, 24, 23, 22, 21, 20, 19, 18, 17, 16, 15, 14],
           speed: 1.4, next: 'stand'
-        }
+        },
+        stand3: { frames: [29] }
       }
     });
 
@@ -65,6 +67,8 @@ export class Player implements CanShoot, NextFrameRunTime, CanShot {
 
     this.playerStand2 = new createjs.Sprite(this.playerSheet, "stand2");
     this.playerDecease2 = new createjs.Sprite(this.playerSheet, "decease2");
+
+    this.playerStand3 = new createjs.Sprite(this.playerSheet, "stand3");
     this.setXY(200, 450);
   }
   /**
@@ -99,6 +103,16 @@ export class Player implements CanShoot, NextFrameRunTime, CanShot {
     this.y = y;
     this.playerjump.x = this.playerRun.x = this.playerStand.x = this.playerDecease.x = this.playerShooting.x = this.playerStandAnimate.x = x;
     this.playerjump.y = this.playerRun.y = this.playerStand.y = this.playerDecease.y = this.playerShooting.y = this.playerStandAnimate.y = y;
+  }
+  stand3(){
+    this.state = 'stand';
+    if(this.curDisplay){
+      this.playerStand3.x = this.curDisplay.x;
+      this.playerStand3.y = this.curDisplay.y;
+    }
+    this.curDisplay = this.playerStand3;
+    this.clearStateExpect(this.curDisplay);
+    this.renderList.push(this.curDisplay);
   }
   clearState(): void {
     this.removeList.push(this.playerRun);
@@ -149,9 +163,16 @@ export class Player implements CanShoot, NextFrameRunTime, CanShot {
     if (expectObject !== this.playerDecease2) {
       this.removeList.push(this.playerDecease2);
     }
+    if (expectObject !== this.playerStand3) {
+      this.removeList.push(this.playerStand3);
+    }
   }
   run(): void {
     this.state = 'run';
+    if(this.curDisplay){
+      this.playerRun.x = this.curDisplay.x;
+      this.playerRun.y = this.curDisplay.y;
+    }
     this.curDisplay = this.playerRun;
     this.clearStateExpect(this.playerRun);
     this.renderList.push(this.playerRun);
@@ -386,7 +407,7 @@ export class Player implements CanShoot, NextFrameRunTime, CanShot {
       setTimeout(() => this.shoot(), 200 * 0)
       setTimeout(() => this.shoot(), 200 * 1)
       setTimeout(() => this.shoot(), 200 * 2)
-    }, 1500)
+    }, 1000)
   }
   closeAutoShoot(): void{
     clearInterval(this.autoShootMark);

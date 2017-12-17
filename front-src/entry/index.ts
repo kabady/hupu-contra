@@ -6,7 +6,9 @@ import { OrientationTip } from './orientLayer/orientLayer';
 import { App } from './app/app'
 import { Game } from './game/game'
 import { routes } from '../router';
-import { pushLoadComplete } from './game/game-asset';
+import { pushLoadComplete, pushGameOverHandle, pushLastPageHandle } from './game/game-asset';
+import { GameOver } from './game/gameOver/gameOver';
+import { LastPage } from './last/last';
 
 
 function appInit(): void{
@@ -14,10 +16,23 @@ function appInit(): void{
   new OrientationTip().show();
   let app: App = new App();
   app.show();
+  let game: Game;
+  let gameOver: GameOver;
   pushLoadComplete(function(){
     app.hide();
-    new Game().show();
+    game = new Game();
+    game.show();
   });
+  pushGameOverHandle( function(stage){
+    game.GameOver(stage)
+    game.hide();
+    gameOver = new GameOver();
+    gameOver.show();
+  })
+  pushLastPageHandle(function(){
+    gameOver.hide();
+    new LastPage().show();
+  })
 }
 
 appInit();

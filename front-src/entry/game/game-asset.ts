@@ -58,3 +58,18 @@ export function startLoad(handleComplete: ()=> void = ()=> 0 ){
   }
   assetMapQueue.loadManifest(loadIds);
 }
+
+let gameOverHandle = (stage) => {};
+export function pushGameOverHandle(handle: (stage) => void){
+  gameOverHandle = handle
+}
+export function gameOver(stage){
+  gameOverHandle(stage);
+}
+let lastPageHandle = () => {};
+export function pushLastPageHandle(handle: () => void){
+  lastPageHandle = handle;
+}
+export function lastPageShow(){
+  lastPageHandle()
+}

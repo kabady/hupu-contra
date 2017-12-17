@@ -196,7 +196,6 @@ export class Boss implements CanShot, CanShoot{
           bullet.setAnimateTime(3000);
           bullet.setGodBullet();
         }
-        console.log(bullet)
         this.renderList.push(bullet.displayObject);
         bullet.setOver(() => this.removeList.push(bullet.displayObject));
         bullet.launch();

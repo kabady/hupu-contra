@@ -15,11 +15,11 @@ import { Player } from './game-object/player';
 import { Boss } from './game-object/boss';
 import { GameCtrl } from './gameCtrl';
 import { Bullet } from './game-object/bullet';
-import { assetMapQueue } from './game-asset';
+import { assetMapQueue, gameOver } from './game-asset';
 import { setTimeout } from 'timers';
 
 const devicePixelRatio: number = window.devicePixelRatio;
-const showRatio: number = 568 / 320;
+export const showRatio: number = 568 / 320;
 export class Game implements Page{
   static BOSS_LEVE_0 = 0;
   static BOSS_LEVE_1 = 1;
@@ -118,6 +118,7 @@ export class Game implements Page{
     this.scenceRenderList.push(display);
   }
   nextScene(){
+    let gameIsOver = false;
     while(this.scenceRenderList.length != 0){
       this.stage.removeChild(this.scenceRenderList.pop())
     }
@@ -133,10 +134,11 @@ export class Game implements Page{
       break;
       case Game.BOSS_LEVE_3:
         console.log('game is over')
+        gameIsOver = true
       break;
     }
-    console.log(this.curGameState)
-    if(this.curGameState == Game.BOSS_LEVE_3 + 1){
+    if(gameIsOver){
+      gameOver(this.stage);
       return;
     }
     this.player.enterNextScence(() => {
@@ -145,7 +147,6 @@ export class Game implements Page{
   }
   playerEntered(): void{
     this.showMonologue(this.curGameState)
-    
   }
   open(){
     if(this.curGameState == Game.BOSS_LEVE_3){
@@ -204,7 +205,6 @@ export class Game implements Page{
       this.boss.closeAutoShoot();
     });
     this.player.shootSomeOne(this.boss, (bullet) => {
-      console.log(111)
       this.player.closeAutoShoot();
       this.gameCanplay = false;
       bullet.destory();
@@ -237,7 +237,14 @@ export class Game implements Page{
       }
     });
 
-    createjs.Ticker.addEventListener("tick", (e) => this.createjsTicker(e));
+    createjs.Ticker.addEventListener("tick", (e) => {
+      try{
+        this.createjsTicker(e)
+      }
+      catch(e){
+        console.error('ticker loop error');
+      }
+    });
     // createjs.Ticker.setFPS(10); //Deprecated
     createjs.Ticker.framerate = 30;
   }
@@ -264,6 +271,9 @@ export class Game implements Page{
     this.stage.update();
     this.player.nextFrameRun();
     // 碰撞检测
+    if(!this.gameCanplay){
+      return;
+    }
     let playerShot = false;
     this.player.bullets.forEach((bullet) => {
       if(bullet.displayObject && this.boss.curDisplay && checkPixelCollision(bullet.displayObject, this.boss.curDisplay)){
@@ -282,6 +292,10 @@ export class Game implements Page{
         }
       })
     }
+  }
+  GameOver(stage): void{
+    createjs.Ticker.removeAllEventListeners('tick');
+    console.log(2333)
   }
 }
 export interface NextFrameRunTime{
