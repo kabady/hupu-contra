@@ -3,7 +3,7 @@ let html: string = require('./gameOver.html');
 import { Page } from "../../page";
 import { Player } from '../game-object/player';
 import { showRatio } from '../game';
-import { assetMapQueue } from '../game-asset';
+import { assetMapQueue, lastPageShow } from '../game-asset';
 
 export class GameOver implements Page {
   elemList: Array<Element> = [];
@@ -19,7 +19,8 @@ export class GameOver implements Page {
     let gameElem: HTMLElement = document.createElement('game-over');
     gameElem.innerHTML = html;
     document.querySelector('body').appendChild(gameElem);
-    this.canvas = gameElem.querySelector('#game-over-canvas')
+    this.canvas = gameElem.querySelector('#game-over-canvas');
+    this.elemList.push(gameElem);
   }
   hide(): void {
     this.elemList.forEach((elem) => $(elem).css({ display: 'none' }));
@@ -66,13 +67,12 @@ export class GameOver implements Page {
         this.state = 2
       }
     }else if(this.state == 2){
-
+      createjs.Ticker.removeAllEventListeners('tick');
+      console.log(111);
+      lastPageShow();
     }
 
     this.stage.update();
-  }
-  enterNextScenceOver(): void{
-    console.log(111);
   }
   mouse = 'off';
   manualCreateLine(){

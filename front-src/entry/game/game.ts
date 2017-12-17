@@ -52,9 +52,11 @@ export class Game implements Page{
     this.initCreatejs();
   }
   startBoss(num: number){
-    
+    // test
     if(num == Game.BOSS_LEVE_1)
       num = Game.BOSS_LEVE_3;
+    // ------
+
     this.curGameState = num;
     this.player.scenceState = num;
     switch(num){
@@ -295,7 +297,6 @@ export class Game implements Page{
   }
   GameOver(stage): void{
     createjs.Ticker.removeAllEventListeners('tick');
-    console.log(2333)
   }
 }
 export interface NextFrameRunTime{
