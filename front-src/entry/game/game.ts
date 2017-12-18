@@ -13,10 +13,11 @@ const checkPixelCollision = _window.ndgmr.checkPixelCollision;
 
 import { Player } from './game-object/player';
 import { Boss } from './game-object/boss';
-import { GameCtrl } from './gameCtrl';
 import { Bullet } from './game-object/bullet';
 import { assetMapQueue, gameOver } from './game-asset';
 import { setTimeout } from 'timers';
+import { gameCtrl } from './gameCtrl/gameCtrl';
+
 
 const devicePixelRatio: number = window.devicePixelRatio;
 export const showRatio: number = 568 / 320;
@@ -32,7 +33,7 @@ export class Game implements Page{
   showContainer_width: number;
   player: Player = new Player();
   boss: Boss = new Boss();
-  gameCtrl: GameCtrl = new GameCtrl();
+  gameCtrl = gameCtrl;
   bullets: Array<Bullet> = [];
   scenes: any;
   curGameState: number;
@@ -46,7 +47,7 @@ export class Game implements Page{
     document.querySelector('body').appendChild(gameElem);
     this.elemList.push(gameElem);
     this.canvas = gameElem.querySelector('#canvas');
-    this.gameCtrl.setCtrlContainer(gameElem.querySelector('.ctrl-container'));
+    gameCtrl.show();
     this.startBoss(Game.BOSS_LEVE_0);
     
     this.initCreatejs();
@@ -154,7 +155,7 @@ export class Game implements Page{
     if(this.curGameState == Game.BOSS_LEVE_3){
       setTimeout(() => {
         this.player.autoShoot()
-      }, 2000);
+      }, 1500);
     }
   }
   gameStartPlay(): void{

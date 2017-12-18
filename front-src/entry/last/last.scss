@@ -6,24 +6,17 @@ last-page{
     > .bg{
       position: absolute;
       top: 0;
-      left: 0;
-      width: 100%;
+      left: 50%;
+      transform: translate(-50%);
       height: 100%;
+      display: block;
     }
-  }
-  .canvas{
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    display: block;
   }
   .go-hupubbs{
     position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
+    top: 703 / 962 * 100%;
+    left: 50%;
+    transform: translate(-50%);
+    height: 120 / 962 * 100%;
   }
 }

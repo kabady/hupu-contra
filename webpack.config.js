@@ -67,6 +67,7 @@ var webpack_config = {
 process.argv.forEach((argv) => {
     if (argv === '-p') {
         deploy();
+        httpServiceOpen = false;
     }
 })
 // deploy();

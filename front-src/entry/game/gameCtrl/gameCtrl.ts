@@ -1,7 +1,10 @@
 $(() => {
   require('fastclick').attach(document.body);
 })
-export class GameCtrl{
+import './gameCtrl.scss';
+import { Page } from '../../page';
+let html: string = require('./gameCtrl.html');
+export class GameCtrl implements Page{
   htmlContainer: HTMLElement;
   leftCtrl: HTMLElement;
   rightCtrl: HTMLElement;
@@ -9,16 +12,19 @@ export class GameCtrl{
   leftClickHandle: () => void = () => 0;
   rightClickHandle: () => void = () => 0;
   constructor(){
-    
-  }
-  setCtrlContainer(elem: HTMLElement): void{
-    this.htmlContainer = elem;
+    let ctrlElem = document.createElement('game-ctrl');
+    ctrlElem.innerHTML = html;
+    this.htmlContainer = ctrlElem;
+    document.querySelector('body').appendChild(ctrlElem);
+
     this.setCtrlElem();
+    this.hide();
+    console.log(111)
   }
   setCtrlElem(): void{
-    this.leftCtrl = document.querySelector('.left-ctrl')
-    this.rightCtrl = document.querySelector('.right-ctrl')
-
+    this.leftCtrl = this.htmlContainer.querySelector('.left-ctrl')
+    this.rightCtrl = this.htmlContainer.querySelector('.right-ctrl')
+    
     this.leftCtrl.addEventListener('click', (ev) => this.leftClick(ev));
     this.rightCtrl.addEventListener('click', (ev) => this.rightClick(ev));
   }
@@ -35,4 +41,12 @@ export class GameCtrl{
   rightClick(ev: MouseEvent): void{
     this.rightClickHandle();
   }
+  show(): void{
+    $(this.htmlContainer).css({ display: 'block'});
+  }
+  hide(): void{
+    $(this.htmlContainer).css({ display: 'none'});
+  }
 }
+
+export const gameCtrl = new GameCtrl();

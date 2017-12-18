@@ -230,7 +230,7 @@ export class Player implements CanShoot, NextFrameRunTime, CanShot {
   jumpAnimate: createjs.Tween;
   jumpNumber: number = 0;
   jump(): void {
-    if(this.state != 'stand' && this.state != 'jump'){
+    if(this.state != 'shoot' && this.state != 'stand' && this.state != 'jump'){
       return;
     }
     if(this.jumpNumber == 0){
@@ -408,6 +408,9 @@ export class Player implements CanShoot, NextFrameRunTime, CanShot {
       setTimeout(() => this.shoot(), 200 * 1)
       setTimeout(() => this.shoot(), 200 * 2)
     }, 1000)
+    setTimeout(() => this.shoot(), 200 * 0)
+    setTimeout(() => this.shoot(), 200 * 1)
+    setTimeout(() => this.shoot(), 200 * 2)
   }
   closeAutoShoot(): void{
     clearInterval(this.autoShootMark);

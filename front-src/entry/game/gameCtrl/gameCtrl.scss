@@ -1,0 +1,37 @@
+@function r($rem) {
+    @return $rem / 1800 * 3.2 * 1rem;
+  }
+game-ctrl{
+    .ctrl-container{
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        z-index: 10;
+      }
+      .ctrl-click{
+        position: fixed;
+        // top: 50%;
+        bottom: 20%;
+    
+        width: 100 / 1800 * 100%;
+        
+        border: r(50) solid rgba(#fcfaf7, .7);
+        border-radius: 100%;
+        background: #fcfaf7;
+        background-clip: content-box;
+        opacity: .4;
+        &:after{
+          content: '';
+          display: block;
+          padding-top: 100%;
+        }
+      }
+      .left-ctrl{
+        left: r(90);
+      }
+      .right-ctrl{
+        right: r(90);
+      }
+}

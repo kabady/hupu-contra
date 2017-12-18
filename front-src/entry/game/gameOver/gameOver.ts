@@ -4,6 +4,7 @@ import { Page } from "../../page";
 import { Player } from '../game-object/player';
 import { showRatio } from '../game';
 import { assetMapQueue, lastPageShow } from '../game-asset';
+import { gameCtrl } from '../gameCtrl/gameCtrl';
 
 export class GameOver implements Page {
   elemList: Array<Element> = [];
@@ -44,6 +45,7 @@ export class GameOver implements Page {
 
     this.basketball = new createjs.Bitmap(assetMapQueue.getResult('basketball'));
     
+    gameCtrl.hide();
     // this.manualCreateLine(); // 开启篮球路线
   }
   createjsTicker(e): void{

@@ -1,3 +1,4 @@
+import '../style/reset-1.0.0.css';
 import '../style/index.scss';
 import 'createjs';
 
@@ -13,7 +14,7 @@ import { LastPage } from './last/last';
 
 function appInit(): void{
   RemInit();
-  new OrientationTip().show();
+  new OrientationTip().hide();
   let app: App = new App();
   app.show();
   let game: Game;
@@ -32,6 +33,16 @@ function appInit(): void{
   pushLastPageHandle(function(){
     gameOver.hide();
     new LastPage().show();
+  })
+
+  document.body.addEventListener('touchstart', (ev) => {
+    ev.preventDefault();
+  })
+  document.body.addEventListener('touchmove', (ev) => {
+    ev.preventDefault();
+  })
+  document.body.addEventListener('touchend', (ev) => {
+    ev.preventDefault();
   })
 }
 
