@@ -16,7 +16,7 @@ import { Boss } from './game-object/boss';
 import { Bullet } from './game-object/bullet';
 import { assetMapQueue, gameOver } from './game-asset';
 import { setTimeout } from 'timers';
-import { gameCtrl } from './gameCtrl/gameCtrl';
+import { gameCtrl, GameCtrl } from './gameCtrl/gameCtrl';
 
 
 const devicePixelRatio: number = window.devicePixelRatio;
@@ -54,8 +54,8 @@ export class Game implements Page{
   }
   startBoss(num: number){
     // test
-    if(num == Game.BOSS_LEVE_1)
-      num = Game.BOSS_LEVE_3;
+    // if(num == Game.BOSS_LEVE_1)
+    //   num = Game.BOSS_LEVE_3;
     // ------
 
     this.curGameState = num;
@@ -80,6 +80,9 @@ export class Game implements Page{
   scene0(){
     this.scenes = assetMapQueue.getResult('scenes0');
     this.boss.setState(Boss.LEVEL_0);
+    
+    this.gameCtrl.setLeftBtnType(GameCtrl.CTRL_BTN_TYPE_JUMP);
+    this.gameCtrl.setRightBtnType(GameCtrl.CTRL_BTN_TYPE_SHOOT);
 
     this.player.stand();
     this.gameCanplay = true;
@@ -87,12 +90,18 @@ export class Game implements Page{
   scene1(){
     this.scenes = assetMapQueue.getResult('scenes1');
 
+    this.gameCtrl.setLeftBtnType(GameCtrl.CTRL_BTN_TYPE_JUMP);
+    this.gameCtrl.setRightBtnType(GameCtrl.CTRL_BTN_TYPE_SHOOT);
+
     this.boss.setState(Boss.LEVEL_1);
     this.player.run();
   }
   scene2(){
     this.scenes = assetMapQueue.getResult('scenes2');
     this.boss.setState(Boss.LEVEL_2);
+
+    this.gameCtrl.setLeftBtnType(GameCtrl.CTRL_BTN_TYPE_JUMP);
+    this.gameCtrl.setRightBtnType(GameCtrl.CTRL_BTN_TYPE_SHOOT);
 
     this.player.run();
   }
@@ -104,6 +113,10 @@ export class Game implements Page{
     this.addScenceObject(this.basketball);
     this.scenes = assetMapQueue.getResult('scenes3');
     this.boss.setState(Boss.LEVEL_3);
+
+    this.gameCtrl.setLeftBtnType(GameCtrl.CTRL_BTN_TYPE_LEFTRUN);
+    this.gameCtrl.setRightBtnType(GameCtrl.CTRL_BTN_TYPE_RIGHTRUN);
+
     this.player.run();
     
   }
@@ -171,11 +184,12 @@ export class Game implements Page{
       break;
       case Game.BOSS_LEVE_1:
       let gameMonologue = $('.game-monologue').css({display: 'block'})
-      setTimeout(() => {anyObj = assetMapQueue.getResult('boss1Playerword1');gameMonologue.empty().append(anyObj)}, 1000 * 0)
-      setTimeout(() => {anyObj = assetMapQueue.getResult('boss1Playerword2');gameMonologue.empty().append(anyObj)}, 1000 * 1)
-      setTimeout(() => {anyObj = assetMapQueue.getResult('boss1Playerword3');gameMonologue.empty().append(anyObj)}, 1000 * 3)
+      let monologueTime = 0;
+      setTimeout(() => {anyObj = assetMapQueue.getResult('boss1Playerword1');gameMonologue.empty().append(anyObj)}, 1000 * (monologueTime += 0))
+      setTimeout(() => {anyObj = assetMapQueue.getResult('boss1Playerword2');gameMonologue.empty().append(anyObj)}, 1000 * (monologueTime += 1))
+      setTimeout(() => {anyObj = assetMapQueue.getResult('boss1Playerword3');gameMonologue.empty().append(anyObj)}, 1000 * (monologueTime += 4))
 
-      waitTime = 5000;
+      waitTime = 1000 * (monologueTime += 4);
       break;
       case Game.BOSS_LEVE_2:
       anyObj = assetMapQueue.getResult('boss2Playerword1');

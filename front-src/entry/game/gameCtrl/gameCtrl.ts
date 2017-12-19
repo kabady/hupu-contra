@@ -1,10 +1,19 @@
-$(() => {
-  require('fastclick').attach(document.body);
-})
+
+const ctrlBackground = {
+  leftRun: require('../../../_assets/game-ctrl-l.png'),
+  rightRun: require('../../../_assets/game-ctrl-r.png'),
+  shoot: require('../../../_assets/game-ctrl-s.png'),
+  jump: require('../../../_assets/game-ctrl-u.png'),
+}
 import './gameCtrl.scss';
 import { Page } from '../../page';
 let html: string = require('./gameCtrl.html');
 export class GameCtrl implements Page{
+  static CTRL_BTN_TYPE_LEFTRUN = 'CTRL_BTN_TYPE_LEFTRUN';
+  static CTRL_BTN_TYPE_RIGHTRUN = 'CTRL_BTN_TYPE_RIGHTRUN';
+  static CTRL_BTN_TYPE_SHOOT = 'CTRL_BTN_TYPE_SHOOT';
+  static CTRL_BTN_TYPE_JUMP = 'CTRL_BTN_TYPE_JUMP';
+
   htmlContainer: HTMLElement;
   leftCtrl: HTMLElement;
   rightCtrl: HTMLElement;
@@ -17,10 +26,39 @@ export class GameCtrl implements Page{
     this.htmlContainer = ctrlElem;
     document.querySelector('body').appendChild(ctrlElem);
 
-    this.setCtrlElem();
+    this.initCtrlElem();
     this.hide();
-    console.log(111)
   }
+  setLeftBtnType(type: string): void{
+    this.setBtnsType(type, this.leftCtrl);
+  }
+  setRightBtnType(type: string): void{
+    this.setBtnsType(type, this.rightCtrl);
+  }
+  setBtnsType(type: string, btnElem: Element):void{
+    switch(type){
+      case GameCtrl.CTRL_BTN_TYPE_JUMP:
+        $(btnElem).css({backgroundImage: `url(${ctrlBackground.jump})`, backgroundSize: '100% 100%'})
+      break;
+      case GameCtrl.CTRL_BTN_TYPE_SHOOT:
+        $(btnElem).css({backgroundImage: `url(${ctrlBackground.shoot})`, backgroundSize: '70% 70%'})
+      break;
+      case GameCtrl.CTRL_BTN_TYPE_LEFTRUN:
+        $(btnElem).css({backgroundImage: `url(${ctrlBackground.leftRun})`, backgroundSize: '100% 100%'})
+      break;
+      case GameCtrl.CTRL_BTN_TYPE_RIGHTRUN:
+        $(btnElem).css({backgroundImage: `url(${ctrlBackground.rightRun})`, backgroundSize: '100% 100%'})
+      break;
+    }
+  }
+  initCtrlElem(): void{
+    this.leftCtrl = this.htmlContainer.querySelector('.left-ctrl')
+    this.rightCtrl = this.htmlContainer.querySelector('.right-ctrl')
+    
+    this.leftCtrl.addEventListener('click', (ev) => this.leftClick(ev));
+    this.rightCtrl.addEventListener('click', (ev) => this.rightClick(ev));
+  }
+  // 过期 使用请使用initCtrlElem
   setCtrlElem(): void{
     this.leftCtrl = this.htmlContainer.querySelector('.left-ctrl')
     this.rightCtrl = this.htmlContainer.querySelector('.right-ctrl')

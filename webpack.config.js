@@ -39,7 +39,7 @@ var webpack_config = {
             test: /\.(scss|sass)$/,
             loaders: 'style-loader!css-loader!postcss-loader!sass-loader'
         }, {
-            test: /\.(png|jpg|jpeg|txt)$/,
+            test: /\.(png|jpg|jpeg|txt|mp3)$/,
             loaders: ToolsContainer.getDependencies('urlPathLoader')
                 // loaders: 'file-loader'
         }, {
