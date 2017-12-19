@@ -15,7 +15,7 @@ import { gameMusic } from './game/gameMusic/gameMusic';
 
 function appInit(): void{
   RemInit();
-  new OrientationTip().hide();
+  new OrientationTip().show();
   let app: App = new App();
   app.show();
   let game: Game;
@@ -25,7 +25,7 @@ function appInit(): void{
     game = new Game();
     game.show();
     gameMusic.show();
-    // gameMusic.play();
+    gameMusic.play();
   });
   pushGameOverHandle( function(stage){
     game.GameOver(stage)
