@@ -38,7 +38,7 @@ export class GameMusic {
   play(): void{
     if(this.isDisplay){
       $(this.elem).removeClass('stop')
-      this.audio.play();
+      // this.audio.play();
       this.isPlay = true;
     }
   }
