@@ -35,18 +35,19 @@ export function pushLoadComplete(loadComplete){
  * @param {()=> void} handleComplete 
  */
 export function startLoad(handleComplete: ()=> void = ()=> 0 ){
+  let waitTime = 1000 * 3;
   let startTimeNumber: number = new Date().getTime();
   pushLoadComplete(handleComplete);
   
   assetMapQueue.on("complete", () => {
     let endTimeNumber: number = new Date().getTime();
-    
-    if(endTimeNumber - startTimeNumber > 1000){
+    console.log(endTimeNumber - startTimeNumber)
+    if(endTimeNumber - startTimeNumber > waitTime){
       loadCompleteArr.forEach((handleComplete)=>handleComplete());
     }else{
       setTimeout(
         ()=>loadCompleteArr.forEach((handleComplete)=>handleComplete()), 
-        1000 - (endTimeNumber - startTimeNumber)
+        waitTime - (endTimeNumber - startTimeNumber)
       );
     }
   });
