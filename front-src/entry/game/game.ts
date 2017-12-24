@@ -260,7 +260,6 @@ export class Game implements Page{
       this.boss.closeAutoShoot();
     });
     this.player.shootSomeOne(this.boss, (bullet) => {
-      shotAudio.play();
       dyingAudio.play();
       this.player.closeAutoShoot();
       this.gameCanplay = false;

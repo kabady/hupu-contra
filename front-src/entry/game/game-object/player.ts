@@ -3,7 +3,7 @@ import { CanShot } from "../canShot";
 import { Bullet } from "./bullet";
 import { NextFrameRunTime, Game } from "../game";
 import { assetMapQueue } from "../game-asset";
-import { shootAudio } from "../gameMusic/gameMusic";
+import { shootAudio, shotAudio } from "../gameMusic/gameMusic";
 
 export class Player implements CanShoot, NextFrameRunTime, CanShot {
   el: createjs.DisplayObject;
@@ -446,6 +446,7 @@ export class Player implements CanShoot, NextFrameRunTime, CanShot {
     if(this.isAlive == false){
       return;
     }
+    shotAudio.play();
     // 这里需要从原数组删除元素，所以必须在一个新的数组上进行遍历
     [].slice.call(this.bullets).forEach( bullet => bullet.over());
     this.jumpAnimate && this.jumpAnimate.setPaused(true);

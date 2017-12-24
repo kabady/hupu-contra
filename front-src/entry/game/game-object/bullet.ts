@@ -75,7 +75,6 @@ export class Bullet {
     this.addAnimationList.push(animateOBJ)
   }
   over(): void {
-    console.log('22333')
     this.overEventHandle();
   }
   setShotOverEventHandle(handle: () => void): void {
