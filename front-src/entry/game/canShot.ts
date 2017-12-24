@@ -21,7 +21,9 @@ export interface CanShot {
      * 已经被WHO击中了
      * 
      * @param {CanShoot} who 
+     * @param {Bullet} bullet 
+     * @returns {hasBeenShot} 
      * @memberof CanShot
      */
-    hasBeenShot(who: CanShoot, bullet: Bullet): void;
+    hasBeenShot(who: CanShoot, bullet: Bullet, pos: any): boolean;
 }

@@ -70,7 +70,6 @@ export class GameOver implements Page {
       }
     }else if(this.state == 2){
       createjs.Ticker.removeAllEventListeners('tick');
-      console.log(111);
       lastPageShow();
     }
 

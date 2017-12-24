@@ -1,0 +1,22 @@
+@function R($rem) {
+  @return $rem / 640 * 3.2 * 1rem;
+}
+.game-teach{
+  position: fixed;
+  height: 100%;
+  width: 100%;
+  top: 0;
+  left: 0;
+  background: rgba(#000, .4);
+  z-index: 11;
+  .teach-title{
+    text-align: center;
+    font-size: R(30);
+    color: #fff;
+    margin-top: R(30);
+    line-height: 1.8;
+  }
+  .teach-title + .teach-title{
+    margin-top: 0;
+  }
+}

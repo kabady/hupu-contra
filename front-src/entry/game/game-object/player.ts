@@ -3,6 +3,7 @@ import { CanShot } from "../canShot";
 import { Bullet } from "./bullet";
 import { NextFrameRunTime, Game } from "../game";
 import { assetMapQueue } from "../game-asset";
+import { shootAudio } from "../gameMusic/gameMusic";
 
 export class Player implements CanShoot, NextFrameRunTime, CanShot {
   el: createjs.DisplayObject;
@@ -112,7 +113,7 @@ export class Player implements CanShoot, NextFrameRunTime, CanShot {
     }
     this.curDisplay = this.playerStand3;
     this.clearStateExpect(this.curDisplay);
-    this.renderList.push(this.curDisplay);
+    this.renderObj(this.curDisplay);
   }
   clearState(): void {
     this.removeList.push(this.playerRun);
@@ -127,12 +128,35 @@ export class Player implements CanShoot, NextFrameRunTime, CanShot {
     this.playerStandAnimate = playerStandAnimate;
     this.curDisplay = this.playerStandAnimate;
     this.clearStateExpect(this.playerStandAnimate);
-    this.renderList.push(this.playerStandAnimate);
+    this.renderObj(this.playerStandAnimate);
     playerStandAnimate.addEventListener('animationend', ()=> {
       this.stand();
     })
   }
   clearStateExpect(expectObject: createjs.DisplayObject): void {
+    this.removeList.push(this.playerRun);
+    this.removeList.push(this.playerStand);
+    this.removeList.push(this.playerDecease);
+    this.removeList.push(this.playerShooting);
+    this.removeList.push(this.playerStandAnimate);
+    this.removeList.push(this.playerjump);
+    this.removeList.push(this.playerStand2);
+    this.removeList.push(this.playerLeftRun);
+    this.removeList.push(this.playerRightRun);
+    this.removeList.push(this.playerDecease2);
+    this.removeList.push(this.playerStand3);
+  }
+  renderObj(obj: createjs.DisplayObject){
+    let newRemoveList = [];
+    this.removeList.forEach( oldObj => {
+      if(obj != oldObj){
+        newRemoveList.push(oldObj);
+      }
+    })
+    this.removeList = newRemoveList;
+    this.renderList.push(obj);
+  }
+  clearStateExpect1(expectObject: createjs.DisplayObject): void {
     if (expectObject !== this.playerRun) {
       this.removeList.push(this.playerRun);
     }
@@ -175,7 +199,7 @@ export class Player implements CanShoot, NextFrameRunTime, CanShot {
     }
     this.curDisplay = this.playerRun;
     this.clearStateExpect(this.playerRun);
-    this.renderList.push(this.playerRun);
+    this.renderObj(this.playerRun);
   }
   runToNextScene(handle: () => void): void {
     this.run();
@@ -217,7 +241,7 @@ export class Player implements CanShoot, NextFrameRunTime, CanShot {
     this.state = 'stand';
     this.curDisplay = this.playerStand;
     this.clearStateExpect(this.curDisplay);
-    this.renderList.push(this.curDisplay);
+    this.renderObj(this.curDisplay);
   }
   stand2(x?: number, y?: number): void{
     this.state = 'stand';
@@ -225,7 +249,7 @@ export class Player implements CanShoot, NextFrameRunTime, CanShot {
     this.playerStand2.x = x || 580;
     this.playerStand2.y = y || 550;
     this.clearStateExpect(this.curDisplay);
-    this.renderList.push(this.curDisplay);
+    this.renderObj(this.curDisplay);
   }
   jumpAnimate: createjs.Tween;
   jumpNumber: number = 0;
@@ -237,7 +261,7 @@ export class Player implements CanShoot, NextFrameRunTime, CanShot {
       this.state = 'jump';
       this.curDisplay = this.playerjump;
       this.clearStateExpect(this.curDisplay);
-      this.renderList.push(this.curDisplay);
+      this.renderObj(this.curDisplay);
       this.jumpAnimate = createjs.Tween.get(this.curDisplay)
       .to({y: this.y * .6 }, 400, createjs.Ease.sineOut)
       .to({y: this.y * 1 }, 400, createjs.Ease.sineIn)
@@ -267,7 +291,7 @@ export class Player implements CanShoot, NextFrameRunTime, CanShot {
     this.playerDecease = playerDecease;
     this.curDisplay = this.playerDecease;
     this.clearStateExpect(this.playerDecease);
-    this.renderList.push(this.playerDecease);
+    this.renderObj(this.playerDecease);
   }
   decease2(): void {
     this.state = 'decease';
@@ -275,7 +299,7 @@ export class Player implements CanShoot, NextFrameRunTime, CanShot {
     this.playerDecease2.y = this.curDisplay.y;
     this.curDisplay = this.playerDecease2;
     this.clearStateExpect(this.curDisplay);
-    this.renderList.push(this.curDisplay);
+    this.renderObj(this.curDisplay);
   }
   theAnimate: Array<() => void> = [];
   shootRelative: Array<ShootRelative> = [];
@@ -300,7 +324,7 @@ export class Player implements CanShoot, NextFrameRunTime, CanShot {
     }
   }
   shoot(): void {
-    if(!(this.state == 'shoot' || this.state == 'stand' || this.state == 'jump')){
+    if(!(this.state == 'shoot' || this.state == 'stand' || this.state == 'jump' || this.state == 'lrun' || this.state == 'rrun')){
       return;
     }
     if(this.isGodPlayer == true){
@@ -310,7 +334,7 @@ export class Player implements CanShoot, NextFrameRunTime, CanShot {
       return;
     }
     this.state = 'shoot';
-
+    shootAudio.play();
     this.setNextFrameRun(() => {
       let bounds: createjs.Rectangle = this.curDisplay.getBounds();
       if (bounds == null) {
@@ -332,7 +356,7 @@ export class Player implements CanShoot, NextFrameRunTime, CanShot {
           }
           // bullet.setEnd(bullet.x, 10); // test debug
           
-          this.renderList.push(bullet.displayObject);
+          this.renderObj(bullet.displayObject);
           bullet.setOver(() => this.removeList.push(bullet.displayObject));
           bullet.launch();
         }
@@ -384,12 +408,15 @@ export class Player implements CanShoot, NextFrameRunTime, CanShot {
    * @param {CanShoot} who 
    * @memberof CanShot
    */
-  hasBeenShot(who: CanShoot, bullet: Bullet): void {
-    this.shootRelative.forEach(shootRelative => {
+  hasBeenShot(who: CanShoot, bullet: Bullet, pos: any): boolean {
+    for(let i = 0, len = this.shootRelative.length; i < len; i++){
+      let shootRelative = this.shootRelative[i];
       if (shootRelative.from == who && shootRelative.to == this) {
         shootRelative.handle(bullet);
+        return true;
       }
-    });
+    }
+    return false;
   }
   bullet_sx: number;
   bullet_sy: number;
@@ -459,7 +486,7 @@ export class Player implements CanShoot, NextFrameRunTime, CanShot {
     this.playerLeftRun.y = this.curDisplay.y;
     this.curDisplay = this.playerLeftRun;
     this.clearStateExpect(this.curDisplay);
-    this.renderList.push(this.curDisplay);
+    this.renderObj(this.curDisplay);
     this.rlRunAnimate = createjs.Tween.get(this.playerLeftRun)
       .to({x: this.curDisplay.x - this.rlRunstandence}, 300)
       .call( () => this.stand2(this.curDisplay.x) )
@@ -479,7 +506,7 @@ export class Player implements CanShoot, NextFrameRunTime, CanShot {
     this.playerRightRun.y = this.curDisplay.y;
     this.curDisplay = this.playerRightRun;
     this.clearStateExpect(this.curDisplay);
-    this.renderList.push(this.curDisplay);
+    this.renderObj(this.curDisplay);
     this.rlRunAnimate = createjs.Tween.get(this.playerRightRun)
       .to({x: this.curDisplay.x + this.rlRunstandence}, 300)
       .call( () => this.stand2(this.curDisplay.x) )

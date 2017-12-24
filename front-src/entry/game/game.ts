@@ -17,6 +17,8 @@ import { Bullet } from './game-object/bullet';
 import { assetMapQueue, gameOver } from './game-asset';
 import { setTimeout } from 'timers';
 import { gameCtrl, GameCtrl } from './gameCtrl/gameCtrl';
+import { GameTeach } from './gameTeach/gameTeach';
+import { shotAudio, dyingAudio } from './gameMusic/gameMusic';
 
 
 const devicePixelRatio: number = window.devicePixelRatio;
@@ -86,6 +88,9 @@ export class Game implements Page{
 
     this.player.stand();
     this.gameCanplay = true;
+    let gameTeach = new GameTeach();
+    gameTeach.start(this.boss);
+    gameTeach.subscribe( () => gameTeach.over() );
   }
   scene1(){
     this.scenes = assetMapQueue.getResult('scenes1');
@@ -176,6 +181,39 @@ export class Game implements Page{
     this.boss.startAutoShoot();
   }
   showMonologue(gameState: number): void{
+    let anyObj: Array<any> = [];
+    let gameMonologue = $('.game-monologue').css({zIndex: 11}).show();
+    switch(gameState){
+      case Game.BOSS_LEVE_0:
+
+      break;
+      case Game.BOSS_LEVE_1:
+      let gameMonologue = $('.game-monologue').css({display: 'block'})
+      anyObj.push(assetMapQueue.getResult('boss1Playerword1'))
+      anyObj.push(assetMapQueue.getResult('boss1Playerword2'))
+      anyObj.push(assetMapQueue.getResult('boss1Playerword3'))
+      break;
+      case Game.BOSS_LEVE_2:
+      anyObj.push(assetMapQueue.getResult('boss2Playerword1'))
+      break;
+      case Game.BOSS_LEVE_3:
+      anyObj.push(assetMapQueue.getResult('boss3Playerword1'))
+      break;
+    }
+    gameMonologue.empty().append(anyObj.shift())
+    gameMonologue.click(() => {
+      if(anyObj.length == 0){
+        gameMonologue.empty().hide();
+        gameMonologue.off('click');
+        this.gameStartPlay()
+        this.open();
+      }else{
+        gameMonologue.empty().append(anyObj.shift())
+      }
+    })
+  }
+  // 弃用
+  showMonologue1(gameState: number): void{
     let waitTime = 0;
     let anyObj: any = null;
     switch(gameState){
@@ -222,6 +260,8 @@ export class Game implements Page{
       this.boss.closeAutoShoot();
     });
     this.player.shootSomeOne(this.boss, (bullet) => {
+      shotAudio.play();
+      dyingAudio.play();
       this.player.closeAutoShoot();
       this.gameCanplay = false;
       bullet.destory();
@@ -293,19 +333,25 @@ export class Game implements Page{
     }
     let playerShot = false;
     this.player.bullets.forEach((bullet) => {
-      if(bullet.displayObject && this.boss.curDisplay && checkPixelCollision(bullet.displayObject, this.boss.curDisplay)){
+      if(bullet.displayObject && this.boss.curDisplay){
         // 击中目标
-        this.player.hasShot(this.boss, bullet);
-        this.boss.hasBeenShot(this.player, bullet);
-        playerShot = true;
+        let pos = checkPixelCollision(bullet.displayObject, this.boss.curDisplay);
+        if(pos){
+          if(this.boss.hasBeenShot(this.player, bullet, pos)){
+            this.player.hasShot(this.boss, bullet);
+            playerShot = true;
+          }
+        }
       }
     })
     if(playerShot == false && this.player.isAlive == true && this.player.isGodPlayer == false){
       this.boss.bullets.forEach( bullet => {
-        if(bullet.displayObject && this.player.curDisplay && checkPixelCollision(bullet.displayObject, this.player.curDisplay)){
+        if(bullet.displayObject && this.player.curDisplay){
           // 击中目标
-          this.boss.hasShot(this.player, bullet);
-          this.player.hasBeenShot(this.boss, bullet);
+          let pos = checkPixelCollision(bullet.displayObject, this.player.curDisplay);
+          if(pos){
+            this.player.hasBeenShot(this.boss, bullet, pos) && this.boss.hasShot(this.player, bullet);
+          }
         }
       })
     }

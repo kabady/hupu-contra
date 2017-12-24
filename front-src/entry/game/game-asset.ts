@@ -23,6 +23,7 @@ export const assetMapStr: Object = {
   scenes3: require('../../_assets/scenes-3.jpg'),
 
   basketball: require('../../_assets/basketball.png'),
+  bossSheet: require('../../_assets/boss-3-sheet.png')
 }
 let loadCompleteArr: Array<()=>void> = [];
 export function pushLoadComplete(loadComplete){
@@ -41,7 +42,6 @@ export function startLoad(handleComplete: ()=> void = ()=> 0 ){
   
   assetMapQueue.on("complete", () => {
     let endTimeNumber: number = new Date().getTime();
-    console.log(endTimeNumber - startTimeNumber)
     if(endTimeNumber - startTimeNumber > waitTime){
       loadCompleteArr.forEach((handleComplete)=>handleComplete());
     }else{

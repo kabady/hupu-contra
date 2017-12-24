@@ -35,10 +35,18 @@ export class GameMusic {
     $(this.elem).addClass('stop')
     this.isPlay = false;
   }
+  rePlay(){
+    if(this.isDisplay){
+      $(this.elem).removeClass('stop')
+      this.audio.currentTime = 0;
+      this.audio.play();
+      this.isPlay = true;
+    }
+  }
   play(): void{
     if(this.isDisplay){
       $(this.elem).removeClass('stop')
-      // this.audio.play();
+      this.audio.play();
       this.isPlay = true;
     }
   }
@@ -52,3 +60,24 @@ export class GameMusic {
   }
 }
 export const gameMusic = new GameMusic();
+
+export class GameAudio {
+  audio: HTMLAudioElement
+  constructor(src?: string) {
+    this.audio = new Audio();
+    if(src && src != ''){
+      this.setSrc(src);
+    }
+  }
+  setSrc(src: string){
+    this.audio.src = src;
+  }
+  play(){
+    this.audio.currentTime = 0;
+    this.audio.play();
+  }
+}
+
+export let shotAudio = new GameAudio(require('../../../_assets/shot.mp3'));
+export let shootAudio = new GameAudio(require('../../../_assets/shoot.mp3'));
+export let dyingAudio = new GameAudio(require('../../../_assets/dying.mp3'));
