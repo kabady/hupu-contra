@@ -12,7 +12,6 @@ import { GameOver } from './game/gameOver/gameOver';
 import { LastPage } from './last/last';
 import { gameMusic } from './game/gameMusic/gameMusic';
 
-
 function appInit(): void{
   RemInit();
   new OrientationTip().show();

@@ -22,6 +22,7 @@ game-music{
   .stop{
     .icon{
       animation-play-state: paused;
+      animation: none !important;
       &:after{
         content: '';
         width: 10px;

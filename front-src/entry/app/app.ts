@@ -2,6 +2,7 @@ import './app.scss';
 let html: string = require('./app.html');
 import { Page } from '../page'
 import { startLoad } from '../game/game-asset';
+import { shotAudio, shootAudio, dyingAudio, victoryAudio, AudioPreload } from '../game/gameMusic/gameMusic';
 
 export class App implements Page{
     elemList: Array<Element> = [];
@@ -29,6 +30,7 @@ export class App implements Page{
         startLoad();
     }
     startLoading():void{
+        AudioPreload();
         $(this.elem.querySelector('.poster')).css({display: 'none'});
         $(this.elem.querySelector('.loading')).css({display: 'block'});
     }

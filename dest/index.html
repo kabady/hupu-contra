@@ -26,6 +26,30 @@
 <body>
 	<app></app>
 </body>
+<script src="http://res.wx.qq.com/open/js/jweixin-1.0.0.js"></script>
+<script>
+wx.config({
+    debug: false,
+    appId: 'wx59def40d590a20c3',
+    timestamp: '1514186802',
+    nonceStr: 'Wm3WZYTPz0wzccnW',
+    signature: '9a6ebf09155a2788b1a547adf5366d4f2bbd32e7',
+    jsApiList: ['onMenuShareTimeline', 'onMenuShareAppMessage']
+});
+wx.ready(function() {
+    var shareData = {
+        title: "魂斗罗：归来  一命通关",
+        desc: "",
+        link: "http://mns.hupu.com/contra",
+        imgUrl: "http://mns.hupu.com/site/contra/weixin_share_logo.jpg",
+        success: function() {},
+        cancel: function() {}
+    };
+    wx.onMenuShareTimeline(shareData);
+    wx.onMenuShareAppMessage(shareData);
+});
+
+</script>
 <script src="lib/easeljs.min.js"></script>
 <script src="lib/tweenjs.min.js"></script>
 <script src="lib/preloadjs.min.js"></script>

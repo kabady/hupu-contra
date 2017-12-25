@@ -5,6 +5,7 @@ import { Player } from '../game-object/player';
 import { showRatio } from '../game';
 import { assetMapQueue, lastPageShow } from '../game-asset';
 import { gameCtrl } from '../gameCtrl/gameCtrl';
+import { gameMusic, victoryAudio } from '../gameMusic/gameMusic';
 
 export class GameOver implements Page {
   elemList: Array<Element> = [];
@@ -69,6 +70,8 @@ export class GameOver implements Page {
         this.state = 2
       }
     }else if(this.state == 2){
+      gameMusic.pause();
+      victoryAudio.play();
       createjs.Ticker.removeAllEventListeners('tick');
       lastPageShow();
     }
