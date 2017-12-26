@@ -60,6 +60,14 @@ export class GameCtrl implements Page{
     
     this.leftCtrl.addEventListener('click', (ev) => this.leftClick(ev));
     this.rightCtrl.addEventListener('click', (ev) => this.rightClick(ev));
+
+    window.addEventListener('keyup', ev => {
+      if(ev.keyCode == 39){
+        this.rightClick(ev);
+      }else if(ev.keyCode == 37){
+        this.leftClick(ev);
+      }
+    })
   }
   // 过期
   // 使用请使用initCtrlElem
@@ -87,11 +95,11 @@ export class GameCtrl implements Page{
   removeRightHandle(num: number): void{
     this.rightClickHandleList[num] = undefined;
   }
-  leftClick(ev: MouseEvent): void{
+  leftClick(ev: Event): void{
     this.leftClickHandleList.forEach(handle => handle && handle() );
     // this.leftClickHandle();
   }
-  rightClick(ev: MouseEvent): void{
+  rightClick(ev: Event): void{
     this.rightClickHandleList.forEach(handle => handle && handle() );
     // this.rightClickHandle();
   }

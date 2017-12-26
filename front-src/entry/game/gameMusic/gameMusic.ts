@@ -137,10 +137,12 @@ export let shotAudio = new GameAudio(require('../../../_assets/shot.mp3'));
 export let shootAudio = new GameAudio(require('../../../_assets/shoot.mp3'));
 export let dyingAudio = new GameAudio(require('../../../_assets/dying.mp3'));
 export let victoryAudio = new GameAudio(require('../../../_assets/victory.mp3'));
+export let jumpAudio = new GameAudio(require('../../../_assets/jump.mp3'));
 
 export function AudioPreload(){
   shotAudio.preload();
   shootAudio.preload();
   dyingAudio.preload();
   victoryAudio.preload();
+  jumpAudio.preload();
 }

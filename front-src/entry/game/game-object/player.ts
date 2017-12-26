@@ -3,7 +3,7 @@ import { CanShot } from "../canShot";
 import { Bullet } from "./bullet";
 import { NextFrameRunTime, Game } from "../game";
 import { assetMapQueue } from "../game-asset";
-import { shootAudio, shotAudio } from "../gameMusic/gameMusic";
+import { shootAudio, shotAudio, jumpAudio } from "../gameMusic/gameMusic";
 
 export class Player implements CanShoot, NextFrameRunTime, CanShot {
   el: createjs.DisplayObject;
@@ -257,6 +257,7 @@ export class Player implements CanShoot, NextFrameRunTime, CanShot {
     if(this.state != 'shoot' && this.state != 'stand' && this.state != 'jump'){
       return;
     }
+    jumpAudio.play();
     if(this.jumpNumber == 0){
       this.state = 'jump';
       this.curDisplay = this.playerjump;
